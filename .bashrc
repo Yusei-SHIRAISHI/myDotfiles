@@ -1,3 +1,5 @@
+[ -e $HOME/.zshenv ] && source $HOME/.zshenv
+
 if [ $(uname) = 'Darwin' ];then
     alias ls="ls -G"
     if [ -f /usr/local/bin/gls ];then
