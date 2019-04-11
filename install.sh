@@ -18,7 +18,7 @@ makeLinksToHomeDir(){
   done;
 }
 
-installList=('.bashrc' '.vimrc' 'tmux.conf')
+installList=('.bashrc' '.vimrc' '.tmux.conf')
 
 makeLinksToHomeDir ${installList[@]}
 
