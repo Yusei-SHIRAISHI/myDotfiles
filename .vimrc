@@ -15,6 +15,8 @@ nnoremap k gk
 nnoremap gj j
 nnoremap gk k
 
+nmap <Esc><Esc> :nohlsearch<CR><Esc>
+
 inoremap <C-d> <Del>
 
 set expandtab
@@ -24,6 +26,7 @@ set shiftwidth=2
 set ignorecase
 set smartcase
 set wrapscan
+set hlsearch
 
 "### complation {{{
 set complete+=k

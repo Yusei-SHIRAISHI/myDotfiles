@@ -25,3 +25,7 @@ if [ -f /usr/local/bin/tmux ]; then
     alias t="tmux";
     alias tls="tmux ls";
 fi
+
+
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init -)"
