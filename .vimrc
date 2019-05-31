@@ -14,10 +14,10 @@ nnoremap j gj
 nnoremap k gk
 nnoremap gj j
 nnoremap gk k
+nnoremap dt <C-d>
+nmap <D-d> x
 
 nmap <Esc><Esc> :nohlsearch<CR><Esc>
-
-inoremap <C-d> <Del>
 
 set expandtab
 set tabstop=2
@@ -39,6 +39,13 @@ inoremap <C-j> <C-x><C-n>
 inoremap <C-k> <C-x><C-o>
 inoremap <C-l> <C-x><C-k>
 inoremap <C-_> <C-x><C-f>
+inoremap <C-d> <Del>
+
+inoremap <C-p> <Up>
+inoremap <C-n> <Down>
+inoremap <C-b> <Left>
+inoremap <C-f> <Right>
+
 
 for key in split("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-$@",'\zs')
       exec printf("inoremap %s %s<Left><Right><C-x><C-n><C-p>", key, key)

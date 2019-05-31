@@ -5,7 +5,7 @@
 #
 
 execdatetime=$(date +%Y-%m-%d-%H:%M:%S)
-currentDir=$(pwd)
+currentDir=$(cd $(dirname $0); pwd)
 buckupDir=$HOME/.dotfiles.buckup
 [ -d ${backupDir} ] || mkdir -p ${backupDir};
 
@@ -22,4 +22,6 @@ installList=('.bashrc' '.vimrc' '.tmux.conf')
 
 makeLinksToHomeDir ${installList[@]}
 
+#install vim-plug
+$(curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim)
 exit 0;
