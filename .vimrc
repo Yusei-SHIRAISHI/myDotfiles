@@ -66,6 +66,9 @@ set wrapscan
 " 前回の検索パターンが存在するとき、それにマッチするテキストを全て強調表示する。
 set hlsearch
 
+"clipboard
+set clipboard=unnamed
+
 "TODO format設定
 set ruler
 
