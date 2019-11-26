@@ -17,6 +17,7 @@ nnoremap <C-e> $
 nnoremap <C-a> ^
 nnoremap <C-f> l
 nnoremap <C-b> h
+nnoremap <silent> <C-y> :call StartReflex()<Enter>
 "insert
 inoremap <C-d> <Del>
 inoremap <C-p> <Up>
@@ -28,7 +29,10 @@ vnoremap <C-e> $
 vnoremap <C-a> ^
 "command
 cnoremap <C-p> <C-r>"
-cnoremap ft <C-u>set filetype=
+cnoremap <C-c> <C-u>set filetype=
+cnoremap <C-f> <Right>
+cnoremap <C-b> <Left>
+cnoremap <silent> <C-s> <C-u>terminal<Enter>
 
 "title表示
 set laststatus=2
@@ -62,6 +66,9 @@ set wrapscan
 " 前回の検索パターンが存在するとき、それにマッチするテキストを全て強調表示する。
 set hlsearch
 
+"TODO format設定
+set ruler
+
 "補完機能
 set completeopt=menuone
 for key in split("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-$@",'\zs')
@@ -75,6 +82,9 @@ inoremap ~/ ~/<C-x><C-f><C-p>
 set pumheight=10
 "補完時大文字小文字のなんやかんや
 set infercase
+
+"
+syntax on
 
 "colorscheme
 colorscheme dracula
@@ -100,9 +110,24 @@ augroup EndSpace
 	autocmd VimEnter,WinEnter * match EndSpace /\s\+$/
 augroup END
 
+"tag jump
+set tags=.tags
+let g:reflex_job = 0
+function! StartReflex()
+	!ctags -R -f .tags
+	let reflex_job = job_start(["reflex", "-r", "/*", "ctags", "-R", "-f"])
+endfunction
+function! EndReflex()
+	call job_stop(reflex_job)
+endfunction
+augroup CloseReflex
+	autocmd!
+        autocmd VimLeave * call EndReflex()
+augroup END
+
 "NERD TREE
 map <C-n> :NERDTreeToggle<CR>
-autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-
-"TODO
-"set ruler
+augroup NERDTree
+	autocmd!
+        autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+augroup END
