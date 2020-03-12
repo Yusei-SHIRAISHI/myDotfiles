@@ -3,6 +3,7 @@ syntax on filetype plugin indent on
 call plug#begin('~/.vim/plugged')
 Plug 'dracula/vim', { 'as': 'dracula' }
 Plug 'scrooloose/nerdtree', { 'as': 'nerdtree' }
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 call plug#end()
 
 "keybind
@@ -18,6 +19,7 @@ nnoremap <C-a> ^
 nnoremap <C-f> l
 nnoremap <C-b> h
 nnoremap <silent> <C-y> :call StartReflex()<Enter>
+nnoremap <C-i> :FZF<Enter>
 "insert
 inoremap <C-d> <Del>
 inoremap <C-p> <Up>
@@ -117,6 +119,7 @@ augroup END
 set tags=.tags
 let g:reflex_job = 0
 function! StartReflex()
+	!echo 'start reflex'
 	!ctags -R -f .tags
 	let reflex_job = job_start(["reflex", "-r", "/*", "ctags", "-R", "-f"])
 endfunction
