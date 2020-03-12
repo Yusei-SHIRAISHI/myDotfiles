@@ -6,9 +6,10 @@ Plug 'scrooloose/nerdtree', { 'as': 'nerdtree' }
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 call plug#end()
 
-"keybind
-noremap <ESC> <C-\>
 "normal
+noremap <ESC> <C-\>
+noremap <C-.> <C-t>
+noremap <C-,> <C-l>
 nnoremap j gj
 nnoremap k gk
 nnoremap gj j
