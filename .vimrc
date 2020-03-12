@@ -8,8 +8,6 @@ call plug#end()
 
 "normal
 noremap <ESC> <C-\>
-noremap <C-.> <C-t>
-noremap <C-,> <C-l>
 nnoremap j gj
 nnoremap k gk
 nnoremap gj j
@@ -20,8 +18,9 @@ nnoremap <C-e> $
 nnoremap <C-a> ^
 nnoremap <C-f> l
 nnoremap <C-b> h
-nnoremap <silent> <C-y> :call StartReflex()<Enter>
-nnoremap <C-i> :FZF<Enter>
+nnoremap <C-i> <C-]>
+nnoremap <silent> <C-u> :call StartReflex()<Enter>
+nnoremap <C-y> :FZF<Enter>
 "insert
 inoremap <C-d> <Del>
 inoremap <C-p> <Up>
