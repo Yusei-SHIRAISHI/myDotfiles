@@ -1,82 +1,115 @@
-
-map <Space> <Plug>(mykey)
-
-filetype indent on
-filetype plugin on
+"plugin
+syntax on filetype plugin indent on
 call plug#begin('~/.vim/plugged')
-Plug 'scrooloose/nerdtree'
+Plug 'dracula/vim', { 'as': 'dracula' }
+Plug 'scrooloose/nerdtree', { 'as': 'nerdtree' }
 call plug#end()
 
-set noswapfile
-set number
-
+"keybind
+noremap <ESC> <C-\>
+"normal
 nnoremap j gj
 nnoremap k gk
 nnoremap gj j
 nnoremap gk k
-nnoremap dt <C-d>
-nmap <D-d> x
-
-nmap <Esc><Esc> :nohlsearch<CR><Esc>
-
-set expandtab
-set tabstop=2
-set shiftwidth=2
-
-set ignorecase
-set smartcase
-set wrapscan
-set hlsearch
-
-"### complation {{{
-set complete+=k
-set completeopt=menuone
-set infercase
-set pumheight=10
-
-"# keybind
-inoremap <C-j> <C-x><C-n>
-inoremap <C-k> <C-x><C-o>
-inoremap <C-l> <C-x><C-k>
-inoremap <C-_> <C-x><C-f>
+nnoremap J <C-e>
+nnoremap K <C-y>
+nnoremap <C-e> $
+nnoremap <C-a> ^
+nnoremap <C-f> l
+nnoremap <C-b> h
+"insert
 inoremap <C-d> <Del>
-
 inoremap <C-p> <Up>
 inoremap <C-n> <Down>
 inoremap <C-b> <Left>
 inoremap <C-f> <Right>
+"visual
+vnoremap <C-e> $
+vnoremap <C-a> ^
+"command
+cnoremap <C-p> <C-r>"
+cnoremap ft <C-u>set filetype=
 
+"title表示
+set laststatus=2
+set title
+"行数表示
+set number
+"操作行に色付け
+set cursorline
+"一時ファイルを生成しない
+set noswapfile
+"括弧入力時に対応する括弧を表示
+set showmatch
 
+"ビープ音消去
+set visualbell t_vb=
+set noerrorbells
+
+"大文字小文字を区別しない
+set ignorecase
+
+" バックスペースでインデントや改行を削除できるようにする
+set backspace=indent,eol,start
+
+"検索など
+"検索結果ハイライト
+nnoremap <ESC><ESC> :nohlsearch<CR>
+"検索時大文字小文字を区別する
+set smartcase
+" 検索がファイル末尾まで進んだら、ファイル先頭から再び検索する。
+set wrapscan
+" 前回の検索パターンが存在するとき、それにマッチするテキストを全て強調表示する。
+set hlsearch
+
+"補完機能
+set completeopt=menuone
 for key in split("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-$@",'\zs')
-      exec printf("inoremap %s %s<Left><Right><C-x><C-n><C-p>", key, key)
+	exec printf("inoremap %s %s<Left><Right><C-x><C-n><C-p>", key, key)
 endfor
+"path 補完
 inoremap ./ ./<C-x><C-f><C-p>
 inoremap / /<C-x><C-f><C-p>
 inoremap ~/ ~/<C-x><C-f><C-p>
+"リスト表示最大数
+set pumheight=10
+"補完時大文字小文字のなんやかんや
+set infercase
 
+"indent
+set tabstop=2
+set expandtab
+set shiftwidth=2
+set autoindent
 
-"Nerdtree {{{
+"colorscheme
+"colorscheme dracula
 
-"# NERDTreeToggle wrapper
-nnoremap <silent> <Plug>(mykey)n :call <SID>MY_NERDTreeToggle()<CR>
-nnoremap <silent> <Plug>(mykey)i :call <SID>MY_NERDTreeRefresh()<CR>
-let g:my_nerdtree_status=0
+"全角スペース強調
+highlight FullWidthSpace
+	\ cterm=underline
+	\ ctermfg=LightGreen
+	\ gui=underline
+	\ guifg=LightGreen
+augroup FullWidthSpace
+	autocmd!
+	autocmd VimEnter,WinEnter * call matchadd("FullWidthSpace", "　")
+augroup END
 
-function! s:MY_NERDTreeRefresh()
-  NERDTreeFocus
-  normal R
-  wincmd l
-  let g:my_nerdtree_status = 1
-endfunction
+"末尾スペース可視化
+highlight EndSpace
+	\ ctermbg=199
+	\ guibg=Cyan
+augroup EndSpace
+	autocmd!
+"	autocmd VimEnter,WinEnter * call matchadd("EndSpace", "\s\+$")
+	autocmd VimEnter,WinEnter * match EndSpace /\s\+$/
+augroup END
 
-function! s:MY_NERDTreeToggle()
-  :NERDTreeToggle
-  if g:my_nerdtree_status == 0
-    wincmd l
-  endif
-  let g:my_nerdtree_status = g:my_nerdtree_status ==# 1 ? 0 : 1
-endfunction
+"NERD TREE
+map <C-n> :NERDTreeToggle<CR>
+autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 
-let g:NERDTreeHijackNetrw=1
-let g:NERDTreeWinSize=(&columns / 5)
-"}}}
+"TODO
+"set ruler
