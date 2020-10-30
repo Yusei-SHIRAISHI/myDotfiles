@@ -18,7 +18,7 @@ nnoremap <C-e> $
 nnoremap <C-a> ^
 nnoremap <C-f> l
 nnoremap <C-b> h
-nnoremap <C-i> <C-]>
+nnoremap <C-i> g<C-]>
 nnoremap <silent> <C-u> :call StartReflex()<Enter>
 nnoremap <C-y> :FZF<Enter>
 "insert
@@ -32,7 +32,7 @@ vnoremap <C-e> $
 vnoremap <C-a> ^
 "command
 cnoremap <C-p> <C-r>"
-cnoremap <C-c> <C-u>set filetype=
+"cnoremap <C-c> <C-u>set filetype=
 cnoremap <C-f> <Right>
 cnoremap <C-b> <Left>
 cnoremap <silent> <C-s> <C-u>terminal<Enter>
@@ -125,7 +125,6 @@ augroup END
 set tags=.tags
 let g:reflex_job = 0
 function! StartReflex()
-	!echo 'start reflex'
 	!ctags -R -f .tags
 	let reflex_job = job_start(["reflex", "-r", "/*", "ctags", "-R", "-f"])
 endfunction
