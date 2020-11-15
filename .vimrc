@@ -3,10 +3,11 @@ syntax on filetype plugin indent on
 call plug#begin('~/.vim/plugged')
 Plug 'dracula/vim', { 'as': 'dracula' }
 Plug 'scrooloose/nerdtree', { 'as': 'nerdtree' }
+Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
 call plug#end()
 
-"keybind
 "normal
+noremap <ESC> <C-\>
 nnoremap j gj
 nnoremap k gk
 nnoremap gj j
@@ -17,7 +18,9 @@ nnoremap <C-e> $
 nnoremap <C-a> ^
 nnoremap <C-f> l
 nnoremap <C-b> h
-nnoremap <silent> <C-y> :call StartReflex()<Enter>
+nnoremap <C-i> g<C-]>
+nnoremap <silent> <C-u> :call StartReflex()<Enter>
+nnoremap <C-y> :FZF<Enter>
 "insert
 inoremap <C-d> <Del>
 inoremap <C-p> <Up>
@@ -29,7 +32,7 @@ vnoremap <C-e> $
 vnoremap <C-a> ^
 "command
 cnoremap <C-p> <C-r>"
-cnoremap <C-c> <C-u>set filetype=
+"cnoremap <C-c> <C-u>set filetype=
 cnoremap <C-f> <Right>
 cnoremap <C-b> <Left>
 cnoremap <silent> <C-s> <C-u>terminal<Enter>
@@ -66,11 +69,11 @@ set wrapscan
 " 前回の検索パターンが存在するとき、それにマッチするテキストを全て強調表示する。
 set hlsearch
 
-"TODO format設定
-set ruler
-
 "clipboard
 set clipboard=unnamed
+
+"TODO format設定
+set ruler
 
 "補完機能
 set completeopt=menuone
@@ -86,15 +89,11 @@ set pumheight=10
 "補完時大文字小文字のなんやかんや
 set infercase
 
-"tabをスペースにする
+"default indent
+set tabstop=2
 set expandtab
-
-"
-syntax on
-
-"default
-autocmd!
-autocmd FileType ruby setlocal tabstop=2 shiftwidth=2
+set shiftwidth=2
+set autoindent
 
 "ファイル別設定
 "c,c++
@@ -108,6 +107,8 @@ augroup ruby_setting
         autocmd!
         autocmd FileType ruby setlocal tabstop=2 shiftwidth=2
 augroup END
+
+syntax on
 
 "colorscheme
 colorscheme dracula
