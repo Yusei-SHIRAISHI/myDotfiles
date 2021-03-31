@@ -91,12 +91,25 @@ set pumheight=10
 "補完時大文字小文字のなんやかんや
 set infercase
 
-"indent
+"default indent
 set tabstop=2
 set expandtab
 set shiftwidth=2
 set autoindent
-"
+
+"ファイル別設定
+"c,c++
+augroup c_cpp_setting
+        autocmd!
+        autocmd FileType c,cpp setlocal tabstop=2 shiftwidth=2
+augroup END
+
+"ruby
+augroup ruby_setting
+        autocmd!
+        autocmd FileType ruby setlocal tabstop=2 shiftwidth=2
+augroup END
+
 syntax on
 
 "colorscheme
