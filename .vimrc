@@ -1,9 +1,18 @@
 "plugin
 syntax on filetype plugin indent on
 call plug#begin('~/.vim/plugged')
-Plug 'dracula/vim', { 'as': 'dracula' }
-Plug 'scrooloose/nerdtree', { 'as': 'nerdtree' }
-Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+  "lsp
+  Plug 'prabirshrestha/vim-lsp'
+  Plug 'mattn/vim-lsp-settings'
+  Plug 'prabirshrestha/asyncomplete.vim'
+  Plug 'prabirshrestha/asyncomplete-lsp.vim'
+  Plug 'mattn/vim-lsp-icons'
+  Plug 'hrsh7th/vim-vsnip'
+
+  Plug 'dracula/vim', { 'as': 'dracula' }
+  Plug 'scrooloose/nerdtree', { 'as': 'nerdtree' }
+  Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+  Plug 'junegunn/fzf.vim'
 call plug#end()
 
 "normal
@@ -16,11 +25,15 @@ nnoremap J <C-e>
 nnoremap K <C-y>
 nnoremap <C-e> $
 nnoremap <C-a> ^
-nnoremap <C-f> l
-nnoremap <C-b> h
-nnoremap <C-i> g<C-]>
+nnoremap <C-i> :LspPeekDefinition<Enter>
 nnoremap <silent> <C-u> :call StartReflex()<Enter>
-nnoremap <C-y> :FZF<Enter>
+nnoremap <C-y> :Files<Enter>
+nnoremap <C-f> :Rg<Enter>
+nnoremap <C-k> :Buffers<Enter>
+nnoremap <C-d> :GFOpenDiff<Enter>
+
+"検索結果ハイライト
+nnoremap <ESC><ESC> :nohlsearch<CR>
 "insert
 inoremap <C-d> <Del>
 inoremap <C-p> <Up>
@@ -32,7 +45,7 @@ vnoremap <C-e> $
 vnoremap <C-a> ^
 "command
 cnoremap <C-p> <C-r>"
-"cnoremap <C-c> <C-u>set filetype=
+cnoremap <C-t> <C-u>set filetype=
 cnoremap <C-f> <Right>
 cnoremap <C-b> <Left>
 cnoremap <silent> <C-s> <C-u>terminal<Enter>
@@ -60,8 +73,6 @@ set ignorecase
 set backspace=indent,eol,start
 
 "検索など
-"検索結果ハイライト
-nnoremap <ESC><ESC> :nohlsearch<CR>
 "検索時大文字小文字を区別する
 set smartcase
 " 検索がファイル末尾まで進んだら、ファイル先頭から再び検索する。
@@ -75,15 +86,6 @@ set clipboard=unnamed
 "TODO format設定
 set ruler
 
-"補完機能
-set completeopt=menuone
-for key in split("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_-$@",'\zs')
-	exec printf("inoremap %s %s<Left><Right><C-x><C-n><C-p>", key, key)
-endfor
-"path 補完
-inoremap ./ ./<C-x><C-f><C-p>
-inoremap / /<C-x><C-f><C-p>
-inoremap ~/ ~/<C-x><C-f><C-p>
 "リスト表示最大数
 set pumheight=10
 "補完時大文字小文字のなんやかんや
@@ -107,8 +109,8 @@ highlight FullWidthSpace
 	\ gui=underline
 	\ guifg=LightGreen
 augroup FullWidthSpace
-	autocmd!
-	autocmd VimEnter,WinEnter * call matchadd("FullWidthSpace", "　")
+  autocmd!
+  autocmd VimEnter,WinEnter * call matchadd("FullWidthSpace", "　")
 augroup END
 
 "末尾スペース可視化
@@ -117,28 +119,79 @@ highlight EndSpace
 	\ guibg=Cyan
 augroup EndSpace
 	autocmd!
-"	autocmd VimEnter,WinEnter * call matchadd("EndSpace", "\s\+$")
 	autocmd VimEnter,WinEnter * match EndSpace /\s\+$/
 augroup END
 
-"tag jump
-set tags=.tags
-let g:reflex_job = 0
-function! StartReflex()
-	!ctags -R -f .tags
-	let reflex_job = job_start(["reflex", "-r", "/*", "ctags", "-R", "-f"])
+function! GBranchList(A,L,P)
+  return fzf#run(fzf#wrap({'source': 'git branch -a | sed -e "s/ //g" -e "s/remotes\///g" -e "s/\*//g"'}))
 endfunction
-function! EndReflex()
-	call job_stop(reflex_job)
+
+function! GCurrentBranch()
+  if !exists("g:current_branch")
+    let g:current_branch = trim(system("git branch --show-current"))
+  endif
+  return g:current_branch
 endfunction
-augroup CloseReflex
-	autocmd!
-        autocmd VimLeave * call EndReflex()
+
+command -nargs=? -bang -complete=customlist,GBranchList GFOpenDiff call GDiffFOpenFunc(<q-args>)
+function! GDiffFOpenFunc(branch)
+  let branch = a:branch == '' ? GCurrentBranch() : a:branch
+
+  let diff_file_name_cmd = 'git diff ' . branch . ' --name-only'
+  let file_path          = fzf#run(fzf#wrap({'source': diff_file_name_cmd}))[0]
+
+  execute "edit " . file_path
+endfunction
+
+let g:diff_tmp_file_prefix = "vimdifftmp"
+command -nargs=? -bang -complete=customlist,GBranchList GDiff call GDiffFunc(<q-args>)
+function! GDiffFunc(branch)
+  let g:is_created_diff_file = 1
+  let branch = a:branch == '' ? GCurrentBranch() : a:branch
+
+  let diff_file_name_cmd = 'git diff ' . branch . ' --name-only'
+  let file_path          = fzf#run(fzf#wrap({'source': diff_file_name_cmd}))[0]
+
+  let diff_id_cmd = 'git diff-index ' . branch . ' ' . file_path . " | awk '{print $3}'"
+  let buff_index  = trim(system(diff_id_cmd))
+
+  let file_base_name = fnamemodify(file_path, ':t')
+  let tmp_file_path  = '/tmp/' . g:diff_tmp_file_prefix . buff_index . '_' . file_base_name
+  let export_tmp_file_cmd  = 'git show ' . buff_index . ' > ' . tmp_file_path
+  let _ = system(export_tmp_file_cmd)
+
+  execute "edit " . file_path
+  execute "vertical diffsplit" . tmp_file_path
+endfunction
+
+augroup GTmpFileRemove
+  autocmd!
+    autocmd VimLeave * call RemoveTmpFile()
 augroup END
+function RemoveTmpFile()
+  if exists(g:is_created_diff_file)
+    let cmd = 'rm /tmp/' . g:diff_tmp_file_prefix . '*'
+    let _ = system(cmd)
+  endif
+endfunction
 
 "NERD TREE
 map <C-n> :NERDTreeToggle<CR>
 augroup NERDTree
-	autocmd!
-        autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
+  autocmd!
+    autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 augroup END
+
+"LSP setting
+let g:asyncomplete_auto_popup = 0
+
+function! s:check_back_space() abort
+    let col = col('.') - 1
+    return !col || getline('.')[col - 1]  =~ '\s'
+endfunction
+
+inoremap <silent><expr> <TAB>
+  \ pumvisible() ? "\<C-n>" :
+  \ <SID>check_back_space() ? "\<TAB>" :
+  \ asyncomplete#force_refresh()
+inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
