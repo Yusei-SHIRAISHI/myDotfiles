@@ -1,0 +1,18 @@
+[user]
+	email = yusei29game@gmail.com
+	name = yusei-shiraishi
+
+[alias]
+  co = checkout
+  st = status
+  df = diff
+  dt = "!f() { git diff $1 --name-only | fzf -m | xargs sh -c 'vim $@ < /dev/tty' -;}; f"
+
+[push]
+	default = upstream
+
+[diff]
+  tool = vimdiff
+
+[difftool]
+  prompt = false
