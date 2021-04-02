@@ -9,11 +9,12 @@ call plug#begin('~/.vim/plugged')
   Plug 'mattn/vim-lsp-icons'
   Plug 'hrsh7th/vim-vsnip'
 
-  Plug 'dracula/vim', { 'as': 'dracula' }
   Plug 'scrooloose/nerdtree', { 'as': 'nerdtree' }
   Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
   Plug 'junegunn/fzf.vim'
 call plug#end()
+
+command! -nargs=0 SL :source %
 
 "normal
 noremap <ESC> <C-\>
@@ -25,15 +26,24 @@ nnoremap J <C-e>
 nnoremap K <C-y>
 nnoremap <C-e> $
 nnoremap <C-a> ^
-nnoremap <C-i> :LspPeekDefinition<Enter>
-nnoremap <silent> <C-u> :call StartReflex()<Enter>
-nnoremap <C-y> :Files<Enter>
-nnoremap <C-f> :Rg<Enter>
-nnoremap <C-k> :Buffers<Enter>
-nnoremap <C-d> :GFOpenDiff<Enter>
+nnoremap <C-i> :LspPeekDefinition<CR>
+nnoremap <silent> <C-u> :call StartReflex()<CR>
+nnoremap <C-y> :Files<CR>
+nnoremap <C-f> :Rg<CR>
+nnoremap <C-k> :Buffers<CR>
+nnoremap <C-d> :GFOpenDiff<CR>
+nnoremap <C-x> :set paste<CR>
+nnoremap <C-z> :set paste!<CR>
+" recording off
+nnoremap q <Nop>
+nnoremap q: <Nop>
 
-"検索結果ハイライト
+"検索結果ハイライト解除
 nnoremap <ESC><ESC> :nohlsearch<CR>
+
+"# buffer next/preview
+nnoremap <silent> <Up> :bnext<CR>
+nnoremap <silent> <Down> :bprevious<CR>
 "insert
 inoremap <C-d> <Del>
 inoremap <C-p> <Up>
@@ -45,14 +55,25 @@ vnoremap <C-e> $
 vnoremap <C-a> ^
 "command
 cnoremap <C-p> <C-r>"
-cnoremap <C-t> <C-u>set filetype=
+cnoremap <C-l> :Filetypes<Enter>
 cnoremap <C-f> <Right>
 cnoremap <C-b> <Left>
 cnoremap <silent> <C-s> <C-u>terminal<Enter>
 
+"# ESCの遅延防止
+if has('unix') && !has('gui_running')
+    inoremap <silent> <ESC> <ESC>
+    inoremap <silent> <C-[> <ESC>
+endif
+
+set foldmethod=marker
+set foldtext=FoldCCtext()
+
 "title表示
 set laststatus=2
 set title
+set showmode
+set statusline=%t%y%=%m%r
 "行数表示
 set number
 "操作行に色付け
@@ -62,15 +83,23 @@ set noswapfile
 "括弧入力時に対応する括弧を表示
 set showmatch
 
+set showcmd
+
 "ビープ音消去
 set visualbell t_vb=
 set noerrorbells
 
 "大文字小文字を区別しない
 set ignorecase
+set smartcase
 
 " バックスペースでインデントや改行を削除できるようにする
 set backspace=indent,eol,start
+
+set ambiwidth=double
+
+set wildmenu
+set wildmode=longest,full
 
 "検索など
 "検索時大文字小文字を区別する
@@ -79,6 +108,7 @@ set smartcase
 set wrapscan
 " 前回の検索パターンが存在するとき、それにマッチするテキストを全て強調表示する。
 set hlsearch
+set incsearch
 
 "clipboard
 set clipboard=unnamed
@@ -96,6 +126,7 @@ set tabstop=2
 set expandtab
 set shiftwidth=2
 set autoindent
+set smartindent
 
 "ファイル別設定
 "c,c++
@@ -113,14 +144,21 @@ augroup END
 syntax on
 
 "colorscheme
-colorscheme dracula
+colorscheme murphy
+
+highlight StatusLine
+						\ term=bold
+						\ ctermfg=16
+						\ ctermbg=252
+						\ guifg=#000000
+						\ guibg=#dddddd
 
 "全角スペース強調
 highlight FullWidthSpace
 	\ cterm=underline
-	\ ctermfg=LightGreen
+	\ ctermfg=WHITE
 	\ gui=underline
-	\ guifg=LightGreen
+	\ guifg=WHITE
 augroup FullWidthSpace
   autocmd!
   autocmd VimEnter,WinEnter * call matchadd("FullWidthSpace", "　")
@@ -208,3 +246,38 @@ inoremap <silent><expr> <TAB>
   \ <SID>check_back_space() ? "\<TAB>" :
   \ asyncomplete#force_refresh()
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
+
+
+" jump current dir
+let g:vimstart_dir=$PWD
+let g:vimhome_dir=g:vimstart_dir
+command! -nargs=0 Home call s:HomeDir()
+function! s:HomeDir()
+  :execute 'cd ' . g:vimhome_dir
+  if(exists("b:NERDTree"))
+    NERDTree
+  else
+    NERDTree
+    NERDTreeClose
+  endif
+endfunction
+
+command! -nargs=? -complete=dir -bang CD  call s:ChangeCurrentDir('<args>', '<bang>')
+function! s:ChangeCurrentDir(directory, bang)
+    if a:directory ==# ''
+        execute "cd " . expand("%:p:h")
+    else
+        execute 'cd ' . a:directory
+    endif
+
+    if a:bang ==# ''
+        pwd
+    endif
+
+    if(exists("b:NERDTree"))
+      NERDTree
+    else
+      NERDTree
+      NERDTreeClose
+    endif
+endfunction
