@@ -4,8 +4,8 @@ call plug#begin('~/.vim/plugged')
 Plug 'dracula/vim', { 'as': 'dracula' }
 Plug 'scrooloose/nerdtree', { 'as': 'nerdtree' }
 Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
+Plug 'mattn/emmet-vim'
 call plug#end()
-
 "normal
 noremap <ESC> <C-\>
 nnoremap j gj
