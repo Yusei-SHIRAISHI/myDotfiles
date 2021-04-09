@@ -16,3 +16,6 @@
 
 [difftool]
   prompt = false
+
+[core]
+	editor = vim -c \"set fenc=utf-8\"

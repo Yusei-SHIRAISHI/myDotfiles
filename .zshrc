@@ -1,6 +1,8 @@
-for x in `ls $HOME/.zsh/functions`;do
-    source $HOME/.zsh/functions/${x}
+for x in `ls $HOME/.zsh.d/`;do
+    source $HOME/.zsh.d/${x}
 done
+
+setopt SH_WORD_SPLIT
 
 setopt auto_cd
 setopt auto_menu
@@ -10,19 +12,44 @@ setopt noautoremoveslash
 
 setopt prompt_subst
 autoload -U colors; colors
+autoload -Uz add-zsh-hook
 
 autoload -Uz vcs_info
 zstyle ':vcs_info:*' enable git
 zstyle ':vcs_info:git:*' check-for-changes true
-zstyle ':vcs_info:git:*' stagedstr "○"
-zstyle ':vcs_info:git:*' unstagedstr "×"
 zstyle ':vcs_info:*' formats       \
-    "%F{green}%b%f %F{red}%u%f%F{red}%c%f"
+    "[%F{green}%b%f] %m"
 zstyle ':vcs_info:*' actionformats \
-    "[%F{magenta}%b|%F{red}%a%f] %F{yellow}%u%f%F{yellow}%c%f"
+    "[%F{magenta}%b|%F{red}%a%f] %m"
+zstyle ':vcs_info:git+set-message:*' hooks \
+	git_set_status_to_misc
+
+function +vi-git_set_status_to_misc() {
+  if [[ "$hook_com[staged]" == "S" ]] || [[ "$hook_com[unstaged]" == "U" ]]; then
+    hook_com[misc]="×"
+  elif [[ -z "$(git log $(hook_com[branch])..origin/$(hook_com[branch]))" ]]; then
+    hook_com[misc]="↑"
+  elif [[ -z "$(git log origin/$(hook_com[branch])..$(hook_com[branch]))" ]]; then
+    hook_com[misc]="↓"
+  else
+    hook_com[misc]="○"
+  fi
+	return 0
+}
+
 precmd () { vcs_info }
 
-PROMPT="%K{green}💩%k %F{cyan}%1~%f \${vcs_info_msg_0_} \${vcs_info_msg_1_}"
+PROMPT="%K{green}💩%k %F{cyan}%1~%f \${vcs_info_msg_0_}"
+add-zsh-hook precmd update_prompt
+function update_prompt() {
+  if [[ $? -eq 0 ]]; then
+		exit_status_color='green'
+	else
+		exit_status_color='red'
+	fi
+  PROMPT="%K{${exit_status_color}}💩%k %F{cyan}%1~%f \${vcs_info_msg_0_} "
+}
+
 
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
 
