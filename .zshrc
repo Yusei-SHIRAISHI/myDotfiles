@@ -4,16 +4,11 @@ done
 
 setopt SH_WORD_SPLIT
 
-setopt auto_cd
-setopt auto_menu
-setopt list_packed
-setopt list_types
-setopt noautoremoveslash
-
 setopt prompt_subst
 autoload -U colors; colors
 autoload -Uz add-zsh-hook
 
+#prompt
 autoload -Uz vcs_info
 zstyle ':vcs_info:*' enable git
 zstyle ':vcs_info:git:*' check-for-changes true
@@ -23,7 +18,6 @@ zstyle ':vcs_info:*' actionformats \
     "[%F{magenta}%b|%F{red}%a%f] %m"
 zstyle ':vcs_info:git+set-message:*' hooks \
 	git_set_status_to_misc
-
 function +vi-git_set_status_to_misc() {
   if [[ "$hook_com[staged]" == "S" ]] || [[ "$hook_com[unstaged]" == "U" ]]; then
     hook_com[misc]="×"
@@ -36,7 +30,6 @@ function +vi-git_set_status_to_misc() {
   fi
 	return 0
 }
-
 precmd () { vcs_info }
 
 PROMPT="%K{green}💩%k %F{cyan}%1~%f \${vcs_info_msg_0_}"
@@ -47,23 +40,34 @@ function update_prompt() {
 	else
 		exit_status_color='red'
 	fi
-  PROMPT="%K{${exit_status_color}}💩%k %F{cyan}%1~%f \${vcs_info_msg_0_} "
+  PROMPT="%K{${exit_status_color}}💩%k %F{cyan}%1~%f\${vcs_info_msg_0_} "
 }
 
-
+#completion
+autoload -U compinit && compinit
+export LSCOLORS=exfxcxdxbxegedabagacad
+export LS_COLORS='di=36:ln=35:so=32:pi=33:ex=31:bd=46;34:cd=43;34:su=41;30:sg=46;30:tw=42;30:ow=43;30'
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Z}'
+zstyle ':completion:*:setopt:*' menu true select
+zstyle ':completion:*:default' list-colors di=36 ex=31 ln=35
+zstyle ':completion:*' completer _complete _approximate _correct _prefix
+zstyle ':completion:*:approximate' max-errors 2 NUMERIC
 
-if [[ -x "$(which dircolors)" ]];then
-    eval $(dircolors)
-elif [[ -x "$(which gdircolors)" ]];then
-    eval $(gdircolors)
-fi
+#opt
+setopt auto_cd
+setopt auto_menu
+setopt list_packed
+setopt list_types
+setopt noautoremoveslash
+setopt magic_equal_subst
+setopt print_eight_bit
 
-zstyle ':completion:*:default' list-colors ${LS_COLORS}
-zstyle ':completion:*:*:kill:*:processes' list-colors '=(#b) #([%0-9]#)*=0=01;31'
+#export
+export LANG=en_US.utf8
 
+#alias
+alias ls="ls --color=auto -F"
 alias la='ls -a'
 alias ll='ls -l'
-
 alias cl='clear'
 
