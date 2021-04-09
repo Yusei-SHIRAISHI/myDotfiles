@@ -234,6 +234,9 @@ augroup NERDTree
     autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
 augroup END
 
+let g:NERDTreeDirArrowExpandable  = ''
+let g:NERDTreeDirArrowCollapsible = ''
+
 "LSP setting
 let g:asyncomplete_auto_popup = 0
 
