@@ -68,6 +68,6 @@ export LANG=en_US.utf8
 #alias
 alias ls="ls --color=auto -F"
 alias la='ls -a'
-alias ll='ls -l'
+alias ll='ls -l -a'
 alias cl='clear'
 
