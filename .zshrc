@@ -22,9 +22,9 @@ function +vi-git_set_status_to_misc() {
   if [[ "$hook_com[staged]" == "S" ]] || [[ "$hook_com[unstaged]" == "U" ]]; then
     hook_com[misc]="×"
   elif [[ -n "$(git log $hook_com[branch]..origin/$hook_com[branch])" ]]; then
-    hook_com[misc]="↑"
-  elif [[ -n "$(git log origin/$hook_com[branch]..$hook_com[branch])" ]]; then
     hook_com[misc]="↓"
+  elif [[ -n "$(git log origin/$hook_com[branch]..$hook_com[branch])" ]]; then
+    hook_com[misc]="↑"
   else
     hook_com[misc]="○"
   fi
