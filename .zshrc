@@ -71,3 +71,7 @@ alias la='ls -a'
 alias ll='ls -l -a'
 alias cl='clear'
 
+if [ -f /usr/local/bin/tmux ]; then
+    alias t="tmux";
+    alias tls="tmux ls";
+fi

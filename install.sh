@@ -18,10 +18,8 @@ makeLinksToHomeDir(){
   done;
 }
 
-installList=('.bashrc' '.vimrc' '.tmux.conf')
+installList=('.bashrc' '.vimrc' '.tmux.conf' '.zshrc' '.zsh.d')
 
 makeLinksToHomeDir ${installList[@]}
 
-#install vim-plug
-$(curl -fLo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim)
 exit 0;
