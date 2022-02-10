@@ -140,6 +140,12 @@ augroup c_cpp_setting
         autocmd FileType c,cpp setlocal tabstop=2 shiftwidth=2
 augroup END
 
+"c#
+augroup c_cpp_setting
+        autocmd!
+        autocmd FileType c,cpp setlocal tabstop=4 shiftwidth=4
+augroup END
+
 "ruby
 augroup ruby_setting
         autocmd!
