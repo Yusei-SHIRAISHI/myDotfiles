@@ -1,5 +1,6 @@
 "plugin
 syntax on filetype plugin indent on
+
 call plug#begin('~/.vim/plugged')
   "lsp
   Plug 'prabirshrestha/vim-lsp'
@@ -9,6 +10,7 @@ call plug#begin('~/.vim/plugged')
   Plug 'mattn/vim-lsp-icons'
   Plug 'hrsh7th/vim-vsnip'
 
+  Plug 'nanotech/jellybeans.vim'
   Plug 'mattn/emmet-vim'
   Plug 'scrooloose/nerdtree', { 'as': 'nerdtree' }
   Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
@@ -27,8 +29,7 @@ nnoremap J <C-e>
 nnoremap K <C-y>
 nnoremap <C-e> $
 nnoremap <C-a> ^
-nnoremap <C-i> :LspPeekDefinition<CR>
-nnoremap <silent> <C-u> :call StartReflex()<CR>
+nnoremap <C-i> :LspDefinition<CR>
 nnoremap <C-y> :Files<CR>
 nnoremap <C-f> :Rg<CR>
 nnoremap <C-k> :Buffers<CR>
@@ -59,7 +60,7 @@ cnoremap <C-p> <C-r>"
 cnoremap <C-l> :Filetypes<Enter>
 cnoremap <C-f> <Right>
 cnoremap <C-b> <Left>
-cnoremap <silent> <C-s> <C-u>terminal<Enter>
+cnoremap <silent><C-g> <C-u>terminal<Enter>
 
 "# ESCの遅延防止
 if has('unix') && !has('gui_running')
@@ -79,8 +80,11 @@ set statusline=%t%y%=%m%r
 set number
 "操作行に色付け
 set cursorline
-"一時ファイルを生成しない
-set noswapfile
+" swpファイル出力先
+set directory=~/.vim/swp/
+" undoファイル出力先
+set undodir=~/.vim/undo/
+set undofile
 "括弧入力時に対応する括弧を表示
 set showmatch
 
@@ -145,7 +149,8 @@ augroup END
 syntax on
 
 "colorscheme
-colorscheme murphy
+colorscheme jellybeans
+
 
 highlight StatusLine
 						\ term=bold
@@ -178,6 +183,12 @@ function! GBranchList(A,L,P)
   return fzf#run(fzf#wrap({'source': 'git branch -a | sed -e "s/ //g" -e "s/remotes\///g" -e "s/\*//g"'}))
 endfunction
 
+highlight Normal ctermbg=none
+highlight NonText ctermbg=none
+highlight LineNr ctermbg=none
+highlight Folded ctermbg=none
+highlight EndOfBuffer ctermbg=none
+
 function! GCurrentBranch()
   if !exists("g:current_branch")
     let g:current_branch = trim(system("git branch --show-current"))
@@ -190,7 +201,11 @@ function! GDiffFOpenFunc(branch)
   let branch = a:branch == '' ? GCurrentBranch() : a:branch
 
   let diff_file_name_cmd = 'git diff ' . branch . ' --name-only'
+
   let file_path          = fzf#run(fzf#wrap({'source': diff_file_name_cmd}))[0]
+
+  echo fzf#wrap({'source': diff_file_name_cmd})
+  echo fzf#run(fzf#wrap({'source': diff_file_name_cmd}))
 
   execute "edit " . file_path
 endfunction
@@ -239,6 +254,12 @@ let g:NERDTreeDirArrowCollapsible = ''
 
 "LSP setting
 let g:asyncomplete_auto_popup = 0
+let g:lsp_log_verbose = 1  " デバッグ用ログを出力
+let g:lsp_log_file = expand('~/.cache/tmp/vim-lsp.log')  " ログ出力のPATHを設定
+let g:lsp_diagnostics_enabled = 0 " エラー表示をoff
+
+let g:lsp_settings_filetype_ruby = 'solargraph'
+let g:lsp_settings_filetype_rust = 'rls'
 
 function! s:check_back_space() abort
     let col = col('.') - 1
@@ -250,7 +271,6 @@ inoremap <silent><expr> <TAB>
   \ <SID>check_back_space() ? "\<TAB>" :
   \ asyncomplete#force_refresh()
 inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-
 
 " jump current dir
 let g:vimstart_dir=$PWD
@@ -285,3 +305,41 @@ function! s:ChangeCurrentDir(directory, bang)
       NERDTreeClose
     endif
 endfunction
+
+function! s:get_syn_id(transparent)
+  let synid = synID(line("."), col("."), 1)
+  if a:transparent
+    return synIDtrans(synid)
+  else
+    return synid
+  endif
+endfunction
+function! s:get_syn_attr(synid)
+  let name = synIDattr(a:synid, "name")
+  let ctermfg = synIDattr(a:synid, "fg", "cterm")
+  let ctermbg = synIDattr(a:synid, "bg", "cterm")
+  let guifg = synIDattr(a:synid, "fg", "gui")
+  let guibg = synIDattr(a:synid, "bg", "gui")
+  return {
+        \ "name": name,
+        \ "ctermfg": ctermfg,
+        \ "ctermbg": ctermbg,
+        \ "guifg": guifg,
+        \ "guibg": guibg}
+endfunction
+function! s:get_syn_info()
+  let baseSyn = s:get_syn_attr(s:get_syn_id(0))
+  echo "name: " . baseSyn.name .
+        \ " ctermfg: " . baseSyn.ctermfg .
+        \ " ctermbg: " . baseSyn.ctermbg .
+        \ " guifg: " . baseSyn.guifg .
+        \ " guibg: " . baseSyn.guibg
+  let linkedSyn = s:get_syn_attr(s:get_syn_id(1))
+  echo "link to"
+  echo "name: " . linkedSyn.name .
+        \ " ctermfg: " . linkedSyn.ctermfg .
+        \ " ctermbg: " . linkedSyn.ctermbg .
+        \ " guifg: " . linkedSyn.guifg .
+        \ " guibg: " . linkedSyn.guibg
+endfunction
+command! SyntaxInfo call s:get_syn_info()
