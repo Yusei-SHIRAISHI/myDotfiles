@@ -151,13 +151,14 @@ syntax on
 "colorscheme
 colorscheme jellybeans
 
-
 highlight StatusLine
 						\ term=bold
 						\ ctermfg=16
 						\ ctermbg=252
 						\ guifg=#000000
 						\ guibg=#dddddd
+
+highlight Visual ctermbg=darkgrey
 
 "全角スペース強調
 highlight FullWidthSpace
