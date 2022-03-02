@@ -1,4 +1,4 @@
-if [[ -d $HOME/.zsh.d ]]; then
+if [[ -d $HOME/.zsh.d ]];then
   for x in `ls $HOME/.zsh.d/`;do
       source $HOME/.zsh.d/${x}
   done
@@ -65,7 +65,8 @@ setopt magic_equal_subst
 setopt print_eight_bit
 
 #export
-export LANG=en_US.utf8
+export LANG=ja_JP.UTF-8
+
 
 #alias
 alias ls="ls --color=auto -F"
