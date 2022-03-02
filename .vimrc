@@ -12,6 +12,7 @@ call plug#begin('~/.vim/plugged')
 
   Plug 'nanotech/jellybeans.vim'
   Plug 'mattn/emmet-vim'
+  Plug 'cohama/lexima.vim'
   Plug 'scrooloose/nerdtree', { 'as': 'nerdtree' }
   Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
   Plug 'junegunn/fzf.vim'
