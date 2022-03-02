@@ -1,6 +1,8 @@
-for x in `ls $HOME/.zsh.d/`;do
-    source $HOME/.zsh.d/${x}
-done
+if [[ -d $HOME/.zsh.d ]]; then
+  for x in `ls $HOME/.zsh.d/`;do
+      source $HOME/.zsh.d/${x}
+  done
+fi
 
 setopt SH_WORD_SPLIT
 
@@ -21,9 +23,9 @@ zstyle ':vcs_info:git+set-message:*' hooks \
 function +vi-git_set_status_to_misc() {
   if [[ "$hook_com[staged]" == "S" ]] || [[ "$hook_com[unstaged]" == "U" ]]; then
     hook_com[misc]="×"
-  elif [[ -n "$(git log $hook_com[branch]..origin/$hook_com[branch])" ]]; then
+  elif [[ -n "$(git log $hook_com[branch]..origin/$hook_com[branch] 2> /dev/null)" ]]; then
     hook_com[misc]="↓"
-  elif [[ -n "$(git log origin/$hook_com[branch]..$hook_com[branch])" ]]; then
+  elif [[ -n "$(git log origin/$hook_com[branch]..$hook_com[branch] 2> /dev/null)" ]]; then
     hook_com[misc]="↑"
   else
     hook_com[misc]="○"
@@ -75,3 +77,4 @@ if [ -f /usr/local/bin/tmux ]; then
     alias t="tmux";
     alias tls="tmux ls";
 fi
+
