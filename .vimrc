@@ -35,15 +35,13 @@ nnoremap <C-y> :Files<CR>
 nnoremap <C-f> :Rg<CR>
 nnoremap <C-k> :Buffers<CR>
 nnoremap <C-d> :GFOpenDiff<CR>
-nnoremap <C-x> :set paste<CR>
-nnoremap <C-z> :set paste!<CR>
+nnoremap <C-x> :set paste!<CR>
+nnoremap f :LspHover<CR>
 " recording off
 nnoremap q <Nop>
 nnoremap q: <Nop>
-
 "検索結果ハイライト解除
 nnoremap <ESC><ESC> :nohlsearch<CR>
-
 "# buffer next/preview
 nnoremap <silent> <Up> :bnext<CR>
 nnoremap <silent> <Down> :bprevious<CR>
@@ -117,7 +115,7 @@ set hlsearch
 set incsearch
 
 "clipboard
-set clipboard=unnamed
+set clipboard+=unnamed
 
 "TODO format設定
 set ruler
