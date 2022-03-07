@@ -187,15 +187,15 @@ augroup EndSpace
 	autocmd VimEnter,WinEnter * match EndSpace /\s\+$/
 augroup END
 
-function! GBranchList(A,L,P)
-  return fzf#run(fzf#wrap({'source': 'git branch -a | sed -e "s/ //g" -e "s/remotes\///g" -e "s/\*//g"'}))
-endfunction
-
 highlight Normal ctermbg=none
 highlight NonText ctermbg=none
 highlight LineNr ctermbg=none
 highlight Folded ctermbg=none
 highlight EndOfBuffer ctermbg=none
+
+function! GBranchList(A,L,P)
+  return fzf#run(fzf#wrap({'source': 'git branch -a | sed -e "s/ //g" -e "s/remotes\///g" -e "s/\*//g"'}))
+endfunction
 
 function! GCurrentBranch()
   if !exists("g:current_branch")

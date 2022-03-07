@@ -1,6 +1,6 @@
 [user]
-	email = yusei.shiraishi29@gmail.com
-	name = Yusei-SHIRAISHI
+  email = yusei.shiraishi29@gmail.com
+  name = Yusei-SHIRAISHI
 
 [alias]
   co = checkout
@@ -9,7 +9,7 @@
   dt = "!f() { git diff $1 --name-only | fzf -m | xargs sh -c 'vim $@ < /dev/tty' -;}; f"
 
 [push]
-	default = upstream
+  default = upstream
 
 [diff]
   tool = vimdiff
@@ -18,4 +18,8 @@
   prompt = false
 
 [core]
-	editor = vim -c \"set fenc=utf-8\"
+  editor = vim -c \"set fenc=utf-8\"
+[mergetool]
+  prompt = false
+[merge]
+  tool = vimdiff
