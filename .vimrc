@@ -45,21 +45,26 @@ nnoremap <ESC><ESC> :nohlsearch<CR>
 "# buffer next/preview
 nnoremap <silent> <Up> :bnext<CR>
 nnoremap <silent> <Down> :bprevious<CR>
+
 "insert
 inoremap <C-d> <Del>
 inoremap <C-p> <Up>
 inoremap <C-n> <Down>
 inoremap <C-b> <Left>
 inoremap <C-f> <Right>
+
 "visual
 vnoremap <C-e> $
 vnoremap <C-a> ^
+"vnoremap <C-u> :s/\v(^|_)(.)/\u\2/g<CR>
+"vnoremap <C-U> :s/\v(^\^[A-Z])/\1_\l\2/g<CR>
+
 "command
 cnoremap <C-p> <C-r>"
-cnoremap <C-l> :Filetypes<Enter>
+cnoremap <C-l> :Filetypes<CR>
 cnoremap <C-f> <Right>
 cnoremap <C-b> <Left>
-cnoremap <silent><C-g> <C-u>terminal<Enter>
+cnoremap <silent><C-g> <C-u>terminal<CR>
 
 "# ESCの遅延防止
 if has('unix') && !has('gui_running')
