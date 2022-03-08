@@ -56,8 +56,10 @@ inoremap <C-f> <Right>
 "visual
 vnoremap <C-e> $
 vnoremap <C-a> ^
-"vnoremap <C-u> :s/\v(^|_)(.)/\u\2/g<CR>
-"vnoremap <C-U> :s/\v(^\^[A-Z])/\1_\l\2/g<CR>
+"sneak_case to pascal case
+vnoremap <C-u> :substitute/\v(^\|_)(.)/\u\2/ge<CR>
+"pascal case to sneak_case
+vnoremap <C-U> :substitute/\v([a-z]\@=)([A-Z])/\1_\2/ge<CR>:*substitute/\v(\u)/\l\1/ge<CR>
 
 "command
 cnoremap <C-p> <C-r>"
@@ -162,20 +164,20 @@ syntax on
 colorscheme jellybeans
 
 highlight StatusLine
-						\ term=bold
-						\ ctermfg=16
-						\ ctermbg=252
-						\ guifg=#000000
-						\ guibg=#dddddd
+            \ term=bold
+            \ ctermfg=16
+            \ ctermbg=252
+            \ guifg=#000000
+            \ guibg=#dddddd
 
 highlight Visual ctermbg=darkgrey
 
 "全角スペース強調
 highlight FullWidthSpace
-	\ cterm=underline
-	\ ctermfg=WHITE
-	\ gui=underline
-	\ guifg=WHITE
+  \ cterm=underline
+  \ ctermfg=WHITE
+  \ gui=underline
+  \ guifg=WHITE
 augroup FullWidthSpace
   autocmd!
   autocmd VimEnter,WinEnter * call matchadd("FullWidthSpace", "　")
@@ -183,11 +185,11 @@ augroup END
 
 "末尾スペース可視化
 highlight EndSpace
-	\ ctermbg=199
-	\ guibg=Cyan
+  \ ctermbg=199
+  \ guibg=Cyan
 augroup EndSpace
-	autocmd!
-	autocmd VimEnter,WinEnter * match EndSpace /\s\+$/
+  autocmd!
+  autocmd VimEnter,WinEnter * match EndSpace /\s\+$/
 augroup END
 
 highlight Normal ctermbg=none
@@ -336,7 +338,7 @@ function! s:get_syn_attr(synid)
         \ "ctermfg": ctermfg,
         \ "ctermbg": ctermbg,
         \ "guifg": guifg,
-        \ "guibg": guibg}
+       \ "guibg": guibg}
 endfunction
 function! s:get_syn_info()
   let baseSyn = s:get_syn_attr(s:get_syn_id(0))
