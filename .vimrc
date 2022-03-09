@@ -57,9 +57,9 @@ inoremap <C-f> <Right>
 vnoremap <C-e> $
 vnoremap <C-a> ^
 "sneak_case to pascal case
-vnoremap <C-u> :substitute/\v(^\|_)(.)/\u\2/ge<CR>
+vnoremap <C-u> :substitute/\v(<\|_)(.)/\u\2/ge<CR>
 "pascal case to sneak_case
-vnoremap <C-U> :substitute/\v([a-z]\@=)([A-Z])/\1_\2/ge<CR>:*substitute/\v(\u)/\l\1/ge<CR>
+vnoremap <C-y> :substitute/\v([a-z]\@=)([A-Z])/\1_\2/ge<CR>:*substitute/\v(\u)/\l\1/ge<CR>
 
 "command
 cnoremap <C-p> <C-r>"
