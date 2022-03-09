@@ -137,25 +137,6 @@ set shiftwidth=2
 set autoindent
 set smartindent
 
-"ファイル別設定
-"c,c++
-augroup c_cpp_setting
-        autocmd!
-        autocmd FileType c,cpp setlocal tabstop=2 shiftwidth=2
-augroup END
-
-"c#
-augroup c_cpp_setting
-        autocmd!
-        autocmd FileType c,cpp setlocal tabstop=4 shiftwidth=4
-augroup END
-
-"ruby
-augroup ruby_setting
-        autocmd!
-        autocmd FileType ruby setlocal tabstop=2 shiftwidth=2
-augroup END
-
 syntax on
 
 "colorscheme
