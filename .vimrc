@@ -68,6 +68,11 @@ cnoremap <C-f> <Right>
 cnoremap <C-b> <Left>
 cnoremap <silent><C-g> <C-u>terminal<CR>
 
+"alias
+command Sjis edit ++enc=cp932
+command Utf8 edit ++enc=utf-8
+command CC set cursorcolumn!
+
 "# ESCの遅延防止
 if has('unix') && !has('gui_running')
     inoremap <silent> <ESC> <ESC>
