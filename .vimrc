@@ -54,6 +54,8 @@ inoremap <C-b> <Left>
 inoremap <C-f> <Right>
 
 "visual
+vnoremap J <C-e>
+vnoremap K <C-y>
 vnoremap <C-e> $
 vnoremap <C-a> ^
 "sneak_case to pascal case
@@ -73,8 +75,7 @@ command Sjis edit ++enc=cp932
 command Utf8 edit ++enc=utf-8
 command CC set cursorcolumn!
 
-set encoding=utf-8
-set fileencodings=iso-2022-jp,euc-jp,sjis,utf-8
+set fileencodings=utf-8,iso-2022-jp,euc-jp,sjis
 
 "# ESCの遅延防止
 if has('unix') && !has('gui_running')
