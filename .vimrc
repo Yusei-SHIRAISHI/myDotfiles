@@ -83,9 +83,6 @@ if has('unix') && !has('gui_running')
     inoremap <silent> <C-[> <ESC>
 endif
 
-set foldmethod=marker
-set foldtext=FoldCCtext()
-
 "title表示
 set laststatus=2
 set title
@@ -346,3 +343,13 @@ function! s:get_syn_info()
         \ " guibg: " . linkedSyn.guibg
 endfunction
 command! SyntaxInfo call s:get_syn_info()
+
+"TODO
+"folding
+"set foldmethod=expr
+"set foldexpr=getline(v:lnum)=~'^\s*\%(\/\/\)'?1:getline(prevnonblank(v:lnum))=~'^\s*\%(\/\/\)'?1:getline(nextnonblank(v:lnum))=~'^\s*\%(\/\/\)'?1:0
+"silent! autocmd BufWinLeave * silent mkview
+"silent! autocmd BufWinEnter * silent loadview
+"set foldtext=getline(v:foldstart)
+"set fillchars=fold:\
+"au Colorscheme * hi Folded ctermfg=HotPink guifg=HotPink]
