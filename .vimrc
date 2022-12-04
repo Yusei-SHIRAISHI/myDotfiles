@@ -75,6 +75,7 @@ command Sjis edit ++enc=cp932
 command Utf8 edit ++enc=utf-8
 command CC set cursorcolumn!
 
+set encoding=utf-8
 set fileencodings=utf-8,iso-2022-jp,euc-jp,sjis
 
 "# ESCの遅延防止
