@@ -95,6 +95,8 @@ set laststatus=2
 set title
 set showmode
 set statusline=%t%y%=%m%r
+"tab表示
+set showtabline=2
 "行数表示
 set number
 "操作行に色付け
@@ -138,8 +140,6 @@ set wrapscan
 set hlsearch
 set incsearch
 
-set showtabline=2
-
 "clipboard
 set clipboard+=unnamed
 
@@ -164,6 +164,13 @@ syntax on
 colorscheme jellybeans
 
 highlight StatusLine
+            \ term=bold
+            \ ctermfg=16
+            \ ctermbg=252
+            \ guifg=#000000
+            \ guibg=#dddddd
+
+highlight TabLine
             \ term=bold
             \ ctermfg=16
             \ ctermbg=252
