@@ -11,7 +11,6 @@ call plug#begin('~/.vim/plugged')
   Plug 'hrsh7th/vim-vsnip'
 
   Plug 'nanotech/jellybeans.vim'
-  Plug 'mattn/emmet-vim'
   Plug 'cohama/lexima.vim'
   Plug 'scrooloose/nerdtree', { 'as': 'nerdtree' }
   Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
@@ -37,14 +36,22 @@ nnoremap <C-k> :Buffers<CR>
 nnoremap <C-d> :GFOpenDiff<CR>
 nnoremap <C-x> :set paste!<CR>
 nnoremap f :LspHover<CR>
-" recording off
-nnoremap q <Nop>
-nnoremap q: <Nop>
 "検索結果ハイライト解除
 nnoremap <ESC><ESC> :nohlsearch<CR>
 "# buffer next/preview
 nnoremap <silent> <Up> :bnext<CR>
 nnoremap <silent> <Down> :bprevious<CR>
+"# tab next/previous
+nnoremap <silent> <Right> :tabnext<CR>
+nnoremap <silent> <Left> :tabprevious<CR>
+" recording off
+nnoremap q <Nop>
+nnoremap q: <Nop>
+" save off
+nnoremap ZZ <Nop>
+nnoremap ZQ <Nop>
+" ex mode off
+nnoremap Q <Nop>
 
 "insert
 inoremap <C-d> <Del>
@@ -65,7 +72,6 @@ vnoremap <C-y> :substitute/\v([a-z]\@=)([A-Z])/\1_\2/ge<CR>:*substitute/\v(\u)/\
 
 "command
 cnoremap <C-p> <C-r>"
-cnoremap <C-l> :Filetypes<CR>
 cnoremap <C-f> <Right>
 cnoremap <C-b> <Left>
 cnoremap <silent><C-g> <C-u>terminal<CR>
@@ -84,23 +90,26 @@ if has('unix') && !has('gui_running')
     inoremap <silent> <C-[> <ESC>
 endif
 
-set foldmethod=marker
-set foldtext=FoldCCtext()
-
 "title表示
 set laststatus=2
 set title
 set showmode
 set statusline=%t%y%=%m%r
+"tab表示
+set showtabline=2
 "行数表示
 set number
 "操作行に色付け
 set cursorline
 " swpファイル出力先
+silent !mkdir ~/.vim/swp -p >/dev/null 2>&1
 set directory=~/.vim/swp/
-" undoファイル出力先
-set undodir=~/.vim/undo/
-set undofile
+" undo 永続化
+silent !mkdir ~/.vim/undo -p >/dev/null 2>&1
+if has('persistent_undo')
+  set undodir=~/.vim/undo
+  set undofile
+endif
 "括弧入力時に対応する括弧を表示
 set showmatch
 
@@ -155,6 +164,13 @@ syntax on
 colorscheme jellybeans
 
 highlight StatusLine
+            \ term=bold
+            \ ctermfg=16
+            \ ctermbg=252
+            \ guifg=#000000
+            \ guibg=#dddddd
+
+highlight TabLine
             \ term=bold
             \ ctermfg=16
             \ ctermbg=252
@@ -347,3 +363,13 @@ function! s:get_syn_info()
         \ " guibg: " . linkedSyn.guibg
 endfunction
 command! SyntaxInfo call s:get_syn_info()
+
+"TODO
+"folding
+"set foldmethod=expr
+"set foldexpr=getline(v:lnum)=~'^\s*\%(\/\/\)'?1:getline(prevnonblank(v:lnum))=~'^\s*\%(\/\/\)'?1:getline(nextnonblank(v:lnum))=~'^\s*\%(\/\/\)'?1:0
+"silent! autocmd BufWinLeave * silent mkview
+"silent! autocmd BufWinEnter * silent loadview
+"set foldtext=getline(v:foldstart)
+"set fillchars=fold:\
+"au Colorscheme * hi Folded ctermfg=HotPink guifg=HotPink]
