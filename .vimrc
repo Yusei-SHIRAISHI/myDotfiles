@@ -17,8 +17,6 @@ call plug#begin('~/.vim/plugged')
   Plug 'junegunn/fzf.vim'
 call plug#end()
 
-command! -nargs=0 SL :source %
-
 "normal
 noremap <ESC> <C-\>
 nnoremap j gj
@@ -34,8 +32,9 @@ nnoremap <C-y> :Files<CR>
 nnoremap <C-f> :Rg<CR>
 nnoremap <C-k> :Buffers<CR>
 nnoremap <C-d> :GFOpenDiff<CR>
-nnoremap <C-x> :set paste!<CR>
+nnoremap <C-l><C-l> :LspDocumentFormat<CR>
 nnoremap f :LspHover<CR>
+nnoremap F :LspReferences<CR>
 "検索結果ハイライト解除
 nnoremap <ESC><ESC> :nohlsearch<CR>
 "# buffer next/preview
@@ -55,8 +54,8 @@ nnoremap Q <Nop>
 
 "insert
 inoremap <C-d> <Del>
-inoremap <C-p> <Up>
-inoremap <C-n> <Down>
+inoremap <C-k> <Up>
+inoremap <C-j> <Down>
 inoremap <C-b> <Left>
 inoremap <C-f> <Right>
 
@@ -75,6 +74,9 @@ cnoremap <C-p> <C-r>"
 cnoremap <C-f> <Right>
 cnoremap <C-b> <Left>
 cnoremap <silent><C-g> <C-u>terminal<CR>
+
+"terminal
+tnoremap <C-p> <C-w>""
 
 "alias
 command Sjis edit ++enc=cp932
@@ -276,10 +278,10 @@ let g:NERDTreeDirArrowCollapsible = ''
 let g:asyncomplete_auto_popup = 0
 let g:lsp_log_verbose = 1  " デバッグ用ログを出力
 let g:lsp_log_file = expand('~/.cache/tmp/vim-lsp.log')  " ログ出力のPATHを設定
-let g:lsp_diagnostics_enabled = 0 " エラー表示をoff
+let g:lsp_diagnostics_enabled = 0 " エラー表示をon
 
 let g:lsp_settings_filetype_ruby = 'solargraph'
-let g:lsp_settings_filetype_rust = 'rls'
+let g:lsp_settings_filetype_rust = 'rust-analyzer'
 
 function! s:check_back_space() abort
     let col = col('.') - 1
