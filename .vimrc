@@ -86,6 +86,9 @@ command CC set cursorcolumn!
 set encoding=utf-8
 set fileencodings=utf-8,iso-2022-jp,euc-jp,sjis
 
+packadd termdebug
+let g:termdebugger = 'rust-gdb'
+
 "# ESCの遅延防止
 if has('unix') && !has('gui_running')
     inoremap <silent> <ESC> <ESC>
@@ -278,7 +281,9 @@ let g:NERDTreeDirArrowCollapsible = ''
 let g:asyncomplete_auto_popup = 0
 let g:lsp_log_verbose = 1  " デバッグ用ログを出力
 let g:lsp_log_file = expand('~/.cache/tmp/vim-lsp.log')  " ログ出力のPATHを設定
-let g:lsp_diagnostics_enabled = 0 " エラー表示をon
+let g:lsp_diagnostics_enabled = 1 " エラー表示をon
+let g:lsp_document_highlight_enabled = 1 " カーソル移動時にハイライトをon
+highlight lspReference ctermfg=darkcyan guifg=darkcyan
 
 let g:lsp_settings_filetype_ruby = 'solargraph'
 let g:lsp_settings_filetype_rust = 'rust-analyzer'
