@@ -10,11 +10,14 @@ call plug#begin('~/.vim/plugged')
   Plug 'mattn/vim-lsp-icons'
   Plug 'hrsh7th/vim-vsnip'
 
+  Plug 'vim-jp/vimdoc-ja'
+  Plug 'itchyny/lightline.vim'
   Plug 'nanotech/jellybeans.vim'
   Plug 'cohama/lexima.vim'
   Plug 'scrooloose/nerdtree', { 'as': 'nerdtree' }
   Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
   Plug 'junegunn/fzf.vim'
+  Plug 'tpope/vim-fugitive'
 call plug#end()
 
 "normal
@@ -25,13 +28,11 @@ nnoremap gj j
 nnoremap gk k
 nnoremap J <C-e>
 nnoremap K <C-y>
+nnoremap <C-n> :NERDTreeToggle<CR>
 nnoremap <C-e> $
 nnoremap <C-a> ^
 nnoremap <C-i> :LspDefinition<CR>
-nnoremap <C-y> :Files<CR>
-nnoremap <C-f> :Rg<CR>
 nnoremap <C-k> :Buffers<CR>
-nnoremap <C-d> :GFOpenDiff<CR>
 nnoremap <C-l><C-l> :LspDocumentFormat<CR>
 nnoremap f :LspHover<CR>
 nnoremap F :LspReferences<CR>
@@ -73,7 +74,6 @@ vnoremap <C-y> :substitute/\v([a-z]\@=)([A-Z])/\1_\2/ge<CR>:*substitute/\v(\u)/\
 cnoremap <C-p> <C-r>"
 cnoremap <C-f> <Right>
 cnoremap <C-b> <Left>
-cnoremap <silent><C-g> <C-u>terminal<CR>
 
 "terminal
 tnoremap <C-p> <C-w>""
@@ -85,6 +85,7 @@ command CC set cursorcolumn!
 
 set encoding=utf-8
 set fileencodings=utf-8,iso-2022-jp,euc-jp,sjis
+set helplang=ja,en
 
 packadd termdebug
 let g:termdebugger = 'rust-gdb'
@@ -99,7 +100,6 @@ endif
 set laststatus=2
 set title
 set showmode
-set statusline=%t%y%=%m%r
 "tab表示
 set showtabline=2
 "行数表示
@@ -168,26 +168,12 @@ syntax on
 "colorscheme
 colorscheme jellybeans
 
-highlight StatusLine
-            \ term=bold
-            \ ctermfg=16
-            \ ctermbg=252
-            \ guifg=#000000
-            \ guibg=#dddddd
-
-highlight TabLine
-            \ term=bold
-            \ ctermfg=16
-            \ ctermbg=252
-            \ guifg=#000000
-            \ guibg=#dddddd
-
 highlight Visual ctermbg=darkgrey
 
 "全角スペース強調
 highlight FullWidthSpace
   \ cterm=underline
-  \ ctermfg=WHITE
+  \ ctermfg=199
   \ gui=underline
   \ guifg=WHITE
 augroup FullWidthSpace
@@ -210,173 +196,21 @@ highlight LineNr ctermbg=none
 highlight Folded ctermbg=none
 highlight EndOfBuffer ctermbg=none
 
-function! GBranchList(A,L,P)
-  return fzf#run(fzf#wrap({'source': 'git branch -a | sed -e "s/ //g" -e "s/remotes\///g" -e "s/\*//g"'}))
-endfunction
-
-function! GCurrentBranch()
-  if !exists("g:current_branch")
-    let g:current_branch = trim(system("git branch --show-current"))
-  endif
-  return g:current_branch
-endfunction
-
-command -nargs=? -bang -complete=customlist,GBranchList GFOpenDiff call GDiffFOpenFunc(<q-args>)
-function! GDiffFOpenFunc(branch)
-  let branch = a:branch == '' ? GCurrentBranch() : a:branch
-
-  let diff_file_name_cmd = 'git diff ' . branch . ' --name-only'
-
-  let file_path          = fzf#run(fzf#wrap({'source': diff_file_name_cmd}))[0]
-
-  echo fzf#wrap({'source': diff_file_name_cmd})
-  echo fzf#run(fzf#wrap({'source': diff_file_name_cmd}))
-
-  execute "edit " . file_path
-endfunction
-
-let g:diff_tmp_file_prefix = "vimdifftmp"
-command -nargs=? -bang -complete=customlist,GBranchList GDiff call GDiffFunc(<q-args>)
-function! GDiffFunc(branch)
-  let g:is_created_diff_file = 1
-  let branch = a:branch == '' ? GCurrentBranch() : a:branch
-
-  let diff_file_name_cmd = 'git diff ' . branch . ' --name-only'
-  let file_path          = fzf#run(fzf#wrap({'source': diff_file_name_cmd}))[0]
-
-  let diff_id_cmd = 'git diff-index ' . branch . ' ' . file_path . " | awk '{print $3}'"
-  let buff_index  = trim(system(diff_id_cmd))
-
-  let file_base_name = fnamemodify(file_path, ':t')
-  let tmp_file_path  = '/tmp/' . g:diff_tmp_file_prefix . buff_index . '_' . file_base_name
-  let export_tmp_file_cmd  = 'git show ' . buff_index . ' > ' . tmp_file_path
-  let _ = system(export_tmp_file_cmd)
-
-  execute "edit " . file_path
-  execute "vertical diffsplit" . tmp_file_path
-endfunction
-
-augroup GTmpFileRemove
-  autocmd!
-    autocmd VimLeave * call RemoveTmpFile()
-augroup END
-function RemoveTmpFile()
-  if exists(g:is_created_diff_file)
-    let cmd = 'rm /tmp/' . g:diff_tmp_file_prefix . '*'
-    let _ = system(cmd)
-  endif
-endfunction
-
-"NERD TREE
-map <C-n> :NERDTreeToggle<CR>
-augroup NERDTree
-  autocmd!
-    autocmd bufenter * if (winnr("$") == 1 && exists("b:NERDTree") && b:NERDTree.isTabTree()) | q | endif
-augroup END
-
-let g:NERDTreeDirArrowExpandable  = ''
-let g:NERDTreeDirArrowCollapsible = ''
-
 "LSP setting
 let g:asyncomplete_auto_popup = 0
 let g:lsp_log_verbose = 1  " デバッグ用ログを出力
 let g:lsp_log_file = expand('~/.cache/tmp/vim-lsp.log')  " ログ出力のPATHを設定
-let g:lsp_diagnostics_enabled = 1 " エラー表示をon
-let g:lsp_document_highlight_enabled = 1 " カーソル移動時にハイライトをon
+let g:lsp_diagnostics_enabled = 1                        " Diagnosticsを有効にする
+let g:lsp_diagnostics_echo_cursor = 1                    " カーソル下のエラー、警告、情報、ヒントを画面下部のコマンドラインに表示
+let g:lsp_diagnostics_echo_delay = 50                    " Diagnosticsの表示の遅延を50msに設定
+let g:lsp_diagnostics_float_cursor = 0                   " カーソル下のエラー、警告、情報、ヒントをフロート表示
+let g:lsp_diagnostics_signs_enabled = 0                  " 画面左端のサイン列にエラー、警告、情報、ヒントのアイコンを非表示
+let g:lsp_diagnostics_signs_insert_mode_enabled = 0      " 挿入モード時、Diagnosticsのサイン列を表示しない
+let g:lsp_diagnostics_highlights_delay = 50              " Diagnosticsの指摘箇所自体の文字ハイライト表示の遅延を50msに設定
+let g:lsp_diagnostics_highlights_insert_mode_enabled = 0 " 挿入モード時、Diagnosticsの指摘箇所自体の文字ハイライトを表示しない
+let g:lsp_document_code_action_signs_enabled = 0         " 画面左端のサイン列にコードアクションのアイコン非表示
+let g:lsp_document_highlight_enabled = 1                 " カーソル移動時にハイライトをon
 highlight lspReference ctermfg=darkcyan guifg=darkcyan
 
 let g:lsp_settings_filetype_ruby = 'solargraph'
 let g:lsp_settings_filetype_rust = 'rust-analyzer'
-
-function! s:check_back_space() abort
-    let col = col('.') - 1
-    return !col || getline('.')[col - 1]  =~ '\s'
-endfunction
-
-inoremap <silent><expr> <TAB>
-  \ pumvisible() ? "\<C-n>" :
-  \ <SID>check_back_space() ? "\<TAB>" :
-  \ asyncomplete#force_refresh()
-inoremap <expr><S-TAB> pumvisible() ? "\<C-p>" : "\<C-h>"
-
-" jump current dir
-let g:vimstart_dir=$PWD
-let g:vimhome_dir=g:vimstart_dir
-command! -nargs=0 Home call s:HomeDir()
-function! s:HomeDir()
-  :execute 'cd ' . g:vimhome_dir
-  if(exists("b:NERDTree"))
-    NERDTree
-  else
-    NERDTree
-    NERDTreeClose
-  endif
-endfunction
-
-command! -nargs=? -complete=dir -bang CD  call s:ChangeCurrentDir('<args>', '<bang>')
-function! s:ChangeCurrentDir(directory, bang)
-    if a:directory ==# ''
-        execute "cd " . expand("%:p:h")
-    else
-        execute 'cd ' . a:directory
-    endif
-
-    if a:bang ==# ''
-        pwd
-    endif
-
-    if(exists("b:NERDTree"))
-      NERDTree
-    else
-      NERDTree
-      NERDTreeClose
-    endif
-endfunction
-
-function! s:get_syn_id(transparent)
-  let synid = synID(line("."), col("."), 1)
-  if a:transparent
-    return synIDtrans(synid)
-  else
-    return synid
-  endif
-endfunction
-function! s:get_syn_attr(synid)
-  let name = synIDattr(a:synid, "name")
-  let ctermfg = synIDattr(a:synid, "fg", "cterm")
-  let ctermbg = synIDattr(a:synid, "bg", "cterm")
-  let guifg = synIDattr(a:synid, "fg", "gui")
-  let guibg = synIDattr(a:synid, "bg", "gui")
-  return {
-        \ "name": name,
-        \ "ctermfg": ctermfg,
-        \ "ctermbg": ctermbg,
-        \ "guifg": guifg,
-       \ "guibg": guibg}
-endfunction
-function! s:get_syn_info()
-  let baseSyn = s:get_syn_attr(s:get_syn_id(0))
-  echo "name: " . baseSyn.name .
-        \ " ctermfg: " . baseSyn.ctermfg .
-        \ " ctermbg: " . baseSyn.ctermbg .
-        \ " guifg: " . baseSyn.guifg .
-        \ " guibg: " . baseSyn.guibg
-  let linkedSyn = s:get_syn_attr(s:get_syn_id(1))
-  echo "link to"
-  echo "name: " . linkedSyn.name .
-        \ " ctermfg: " . linkedSyn.ctermfg .
-        \ " ctermbg: " . linkedSyn.ctermbg .
-        \ " guifg: " . linkedSyn.guifg .
-        \ " guibg: " . linkedSyn.guibg
-endfunction
-command! SyntaxInfo call s:get_syn_info()
-
-"TODO
-"folding
-"set foldmethod=expr
-"set foldexpr=getline(v:lnum)=~'^\s*\%(\/\/\)'?1:getline(prevnonblank(v:lnum))=~'^\s*\%(\/\/\)'?1:getline(nextnonblank(v:lnum))=~'^\s*\%(\/\/\)'?1:0
-"silent! autocmd BufWinLeave * silent mkview
-"silent! autocmd BufWinEnter * silent loadview
-"set foldtext=getline(v:foldstart)
-"set fillchars=fold:\
-"au Colorscheme * hi Folded ctermfg=HotPink guifg=HotPink]
