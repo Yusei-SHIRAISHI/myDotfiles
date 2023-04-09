@@ -201,16 +201,9 @@ let g:asyncomplete_auto_popup = 0
 let g:lsp_log_verbose = 1  " デバッグ用ログを出力
 let g:lsp_log_file = expand('~/.cache/tmp/vim-lsp.log')  " ログ出力のPATHを設定
 let g:lsp_diagnostics_enabled = 1                        " Diagnosticsを有効にする
-let g:lsp_diagnostics_echo_cursor = 1                    " カーソル下のエラー、警告、情報、ヒントを画面下部のコマンドラインに表示
-let g:lsp_diagnostics_echo_delay = 50                    " Diagnosticsの表示の遅延を50msに設定
-let g:lsp_diagnostics_float_cursor = 0                   " カーソル下のエラー、警告、情報、ヒントをフロート表示
-let g:lsp_diagnostics_signs_enabled = 0                  " 画面左端のサイン列にエラー、警告、情報、ヒントのアイコンを非表示
-let g:lsp_diagnostics_signs_insert_mode_enabled = 0      " 挿入モード時、Diagnosticsのサイン列を表示しない
-let g:lsp_diagnostics_highlights_delay = 50              " Diagnosticsの指摘箇所自体の文字ハイライト表示の遅延を50msに設定
-let g:lsp_diagnostics_highlights_insert_mode_enabled = 0 " 挿入モード時、Diagnosticsの指摘箇所自体の文字ハイライトを表示しない
-let g:lsp_document_code_action_signs_enabled = 0         " 画面左端のサイン列にコードアクションのアイコン非表示
 let g:lsp_document_highlight_enabled = 1                 " カーソル移動時にハイライトをon
 highlight lspReference ctermfg=darkcyan guifg=darkcyan
+highlight LspWarningHighlight ctermfg=darkgray guifg=darkgray
 
 let g:lsp_settings_filetype_ruby = 'solargraph'
 let g:lsp_settings_filetype_rust = 'rust-analyzer'
