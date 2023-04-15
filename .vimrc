@@ -207,3 +207,14 @@ highlight LspWarningHighlight ctermfg=darkgray guifg=darkgray
 
 let g:lsp_settings_filetype_ruby = 'solargraph'
 let g:lsp_settings_filetype_rust = 'rust-analyzer'
+
+" WSL clipboard
+if !empty($WSL_DISTRO_NAME)
+ let s:clip = '/mnt/c/Windows/system32/clip.exe'
+ if executable(s:clip)
+   augroup WSLYank
+     autocmd!
+     autocmd TextYankPost * if v:event.operator ==# 'y' | call system(s:clip, @0) | endif
+   augroup END
+ endif
+endif
