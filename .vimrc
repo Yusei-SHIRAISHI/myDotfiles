@@ -55,8 +55,6 @@ nnoremap Q <Nop>
 
 "insert
 inoremap <C-d> <Del>
-inoremap <C-k> <Up>
-inoremap <C-j> <Down>
 inoremap <C-b> <Left>
 inoremap <C-f> <Right>
 
@@ -77,6 +75,25 @@ cnoremap <C-b> <Left>
 
 "terminal
 tnoremap <C-p> <C-w>""
+
+imap <C-j> <Plug>(copilot-next)
+imap <C-k> <Plug>(copilot-previous)
+imap <C-w> <Plug>(copilot-accept-word)
+imap <C-l> <Plug>(copilot-accept-line)
+inoremap <C><BS> :CopilotSuggestToggle<CR>
+
+let g:is_copilot_suggestions_enabled = 1
+function! ToggleCopilotSuggest()
+  echo "copilot suggest toggle"
+  if g:is_copilot_suggestions_enabled
+    let g:is_copilot_suggestions_enabled = 0
+    call copilot#Suggest()
+  else
+    let g:is_copilot_suggestions_enabled = 1
+    call copilot#Dismiss()
+  endif
+endfunction
+command! CopilotSuggestToggle call ToggleCopilotSuggest()
 
 "alias
 command Sjis edit ++enc=cp932
@@ -214,7 +231,7 @@ if !empty($WSL_DISTRO_NAME)
  if executable(s:clip)
    augroup WSLYank
      autocmd!
-     autocmd TextYankPost * if v:event.operator ==# 'y' | call system(s:clip, @0) | endif
+     autocmd TextYankPost * if v:event.operator ==# 'y' | call system(s:clip, @") | endif
    augroup END
  endif
 endif
