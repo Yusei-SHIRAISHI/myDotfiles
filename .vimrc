@@ -80,20 +80,8 @@ imap <C-j> <Plug>(copilot-next)
 imap <C-k> <Plug>(copilot-previous)
 imap <C-w> <Plug>(copilot-accept-word)
 imap <C-l> <Plug>(copilot-accept-line)
-inoremap <C><BS> :CopilotSuggestToggle<CR>
-
-let g:is_copilot_suggestions_enabled = 1
-function! ToggleCopilotSuggest()
-  echo "copilot suggest toggle"
-  if g:is_copilot_suggestions_enabled
-    let g:is_copilot_suggestions_enabled = 0
-    call copilot#Suggest()
-  else
-    let g:is_copilot_suggestions_enabled = 1
-    call copilot#Dismiss()
-  endif
-endfunction
-command! CopilotSuggestToggle call ToggleCopilotSuggest()
+imap <C-r> <Plug>(copilot-dismiss)
+imap <C-r><C-r> <Plug>(copilot-suggest)
 
 "alias
 command Sjis edit ++enc=cp932
