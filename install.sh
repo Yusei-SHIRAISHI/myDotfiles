@@ -18,7 +18,7 @@ makeLinksToHomeDir(){
   done;
 }
 
-installList=('.bashrc' '.vimrc' '.tmux.conf' '.zshrc' '.zsh.d')
+installList=('.bashrc' '.vimrc' '.tmux.conf' '.zshrc' '.zsh.d' '.gitconfig')
 
 makeLinksToHomeDir ${installList[@]}
 
