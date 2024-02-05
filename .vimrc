@@ -41,9 +41,12 @@ nnoremap <ESC><ESC> :nohlsearch<CR>
 "# buffer next/preview
 nnoremap <silent> <Up> :bnext<CR>
 nnoremap <silent> <Down> :bprevious<CR>
-"# tab next/previous
-nnoremap <silent> <Right> :tabnext<CR>
-nnoremap <silent> <Left> :tabprevious<CR>
+"# tab
+nnoremap <S-t>n :tabnew<CR>
+nnoremap <S-t>l :tabnext<CR>
+nnoremap <S-t>h :tabprevious<CR>
+nnoremap <S-t><S-l> :+tabmove<CR>
+nnoremap <S-t><S-h> :-tabmove<CR>
 " recording off
 nnoremap q <Nop>
 nnoremap q: <Nop>
