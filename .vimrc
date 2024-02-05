@@ -14,7 +14,7 @@ call plug#begin('~/.vim/plugged')
   Plug 'itchyny/lightline.vim'
   Plug 'nanotech/jellybeans.vim'
   Plug 'cohama/lexima.vim'
-  Plug 'scrooloose/nerdtree', { 'as': 'nerdtree' }
+  Plug 'preservim/nerdtree'
   Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
   Plug 'junegunn/fzf.vim'
   Plug 'tpope/vim-fugitive'
@@ -43,11 +43,15 @@ nnoremap <ESC><ESC> :nohlsearch<CR>
 nnoremap <silent> <Up> :bnext<CR>
 nnoremap <silent> <Down> :bprevious<CR>
 "# tab
-nnoremap <S-t>n :tabnew<CR>
-nnoremap <S-t>l :tabnext<CR>
-nnoremap <S-t>h :tabprevious<CR>
-nnoremap <S-t><S-l> :+tabmove<CR>
-nnoremap <S-t><S-h> :-tabmove<CR>
+nnoremap [tab_prefix] <Nop>
+nmap <S-t>  [tab_prefix]
+nnoremap [tab_prefix]n :tabnew<CR>
+nnoremap [tab_prefix]e :tabedit %<CR>
+nnoremap [tab_prefix]c :tabclose<CR>
+nnoremap [tab_prefix]l :tabnext<CR>
+nnoremap [tab_prefix]h :tabprevious<CR>
+nnoremap [tab_prefix]<S-l> :+tabmove<CR>
+nnoremap [tab_prefix]<S-h> :-tabmove<CR>
 " recording off
 nnoremap q <Nop>
 nnoremap q: <Nop>
@@ -182,6 +186,18 @@ colorscheme jellybeans
 
 highlight Visual ctermbg=darkgrey
 
+" status line
+let g:lightline = {
+      \ 'colorscheme': 'wombat',
+      \ 'active': {
+      \   'left': [ [ 'mode', 'paste' ],
+      \             [ 'git_statusline','readonly', 'filename', 'modified' ] ]
+      \ },
+      \ 'component_function': {
+      \   'git_statusline': 'FugitiveStatusline'
+      \ },
+      \ }
+
 "全角スペース強調
 highlight FullWidthSpace
   \ cterm=underline
@@ -222,11 +238,19 @@ let g:lsp_settings_filetype_rust = 'rust-analyzer'
 
 " WSL clipboard
 if !empty($WSL_DISTRO_NAME)
- let s:clip = '/mnt/c/Windows/system32/clip.exe'
- if executable(s:clip)
-   augroup WSLYank
-     autocmd!
-     autocmd TextYankPost * if v:event.operator ==# 'y' | call system(s:clip, @") | endif
-   augroup END
+ let s:clip = 'iconv -t sjis | clip.exe'
+ if executable('iconv')
+   if executable('clip.exe')
+     augroup WSLYank
+       autocmd!
+       autocmd TextYankPost * if v:event.operator ==# 'y' | call system(s:clip, @") | endif
+     augroup END
+   endif
  endif
 endif
+
+"nerdtree
+" Exit Vim if NERDTree is the only window remaining in the only tab.
+autocmd BufEnter * if tabpagenr('$') == 1 && winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
+" Close the tab if NERDTree is the only window remaining in it.
+autocmd BufEnter * if winnr('$') == 1 && exists('b:NERDTree') && b:NERDTree.isTabTree() | quit | endif
