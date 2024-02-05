@@ -18,6 +18,7 @@ call plug#begin('~/.vim/plugged')
   Plug 'junegunn/fzf', { 'do': { -> fzf#install() } }
   Plug 'junegunn/fzf.vim'
   Plug 'tpope/vim-fugitive'
+  Plug 'tpope/vim-surround'
 call plug#end()
 
 "normal
@@ -54,7 +55,7 @@ nnoremap q: <Nop>
 nnoremap ZZ <Nop>
 nnoremap ZQ <Nop>
 " ex mode off
-nnoremap Q <Nop>
+"nnoremap Q <Nop>
 
 "insert
 inoremap <C-d> <Del>
@@ -212,7 +213,7 @@ let g:asyncomplete_auto_popup = 0
 let g:lsp_log_verbose = 1  " デバッグ用ログを出力
 let g:lsp_log_file = expand('~/.cache/tmp/vim-lsp.log')  " ログ出力のPATHを設定
 let g:lsp_diagnostics_enabled = 1                        " Diagnosticsを有効にする
-let g:lsp_document_highlight_enabled = 1                 " カーソル移動時にハイライトをon
+let g:lsp_document_highlight_enabled = 0                 " カーソル移動時にハイライトをon
 highlight lspReference ctermfg=darkcyan guifg=darkcyan
 highlight LspWarningHighlight ctermfg=darkgray guifg=darkgray
 
