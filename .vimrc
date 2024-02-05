@@ -126,6 +126,9 @@ endif
 "括弧入力時に対応する括弧を表示
 set showmatch
 
+"diff表示を垂直分割
+set diffopt+=vertical
+
 set showcmd
 
 "ビープ音消去
