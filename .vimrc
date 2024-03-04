@@ -27,11 +27,9 @@ nnoremap j gj
 nnoremap k gk
 nnoremap gj j
 nnoremap gk k
-nnoremap J <C-e>
-nnoremap K <C-y>
+nnoremap <C-j> <C-e>
+nnoremap <C-k> <C-y>
 nnoremap <C-n> :NERDTreeToggle<CR>
-nnoremap <C-e> $
-nnoremap <C-a> ^
 nnoremap <C-i> :LspDefinition<CR>
 nnoremap <C-k> :Buffers<CR>
 nnoremap <C-l><C-l> :LspDocumentFormat<CR>
@@ -53,8 +51,8 @@ nnoremap [tab_prefix]h :tabprevious<CR>
 nnoremap [tab_prefix]<S-l> :+tabmove<CR>
 nnoremap [tab_prefix]<S-h> :-tabmove<CR>
 " recording off
-nnoremap q <Nop>
-nnoremap q: <Nop>
+"nnoremap q <Nop>
+"nnoremap q: <Nop>
 " save off
 nnoremap ZZ <Nop>
 nnoremap ZQ <Nop>
@@ -62,15 +60,18 @@ nnoremap ZQ <Nop>
 "nnoremap Q <Nop>
 
 "insert
-inoremap <C-d> <Del>
 inoremap <C-b> <Left>
 inoremap <C-f> <Right>
+imap <C-j> <Plug>(copilot-next)
+imap <C-k> <Plug>(copilot-previous)
+imap <C-w> <Plug>(copilot-accept-word)
+imap <C-l> <Plug>(copilot-accept-line)
+imap <C-r> <Plug>(copilot-dismiss)
+imap <C-r><C-r> <Plug>(copilot-suggest)
 
 "visual
-vnoremap J <C-e>
-vnoremap K <C-y>
-vnoremap <C-e> $
-vnoremap <C-a> ^
+vnoremap <C-j> <C-e>
+vnoremap <C-k> <C-y>
 "sneak_case to pascal case
 vnoremap <C-u> :substitute/\v(<\|_)(.)/\u\2/ge<CR>
 "pascal case to sneak_case
@@ -82,14 +83,7 @@ cnoremap <C-f> <Right>
 cnoremap <C-b> <Left>
 
 "terminal
-tnoremap <C-p> <C-w>""
-
-imap <C-j> <Plug>(copilot-next)
-imap <C-k> <Plug>(copilot-previous)
-imap <C-w> <Plug>(copilot-accept-word)
-imap <C-l> <Plug>(copilot-accept-line)
-imap <C-r> <Plug>(copilot-dismiss)
-imap <C-r><C-r> <Plug>(copilot-suggest)
+"tnoremap <C-p> <C-w>""
 
 "alias
 command Sjis edit ++enc=cp932
