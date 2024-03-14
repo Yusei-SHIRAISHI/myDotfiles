@@ -31,7 +31,6 @@ nnoremap <C-j> <C-e>
 nnoremap <C-k> <C-y>
 nnoremap <C-n> :NERDTreeToggle<CR>
 nnoremap <C-i> :LspDefinition<CR>
-nnoremap <C-k> :Buffers<CR>
 nnoremap <C-l><C-l> :LspDocumentFormat<CR>
 nnoremap f :LspHover<CR>
 nnoremap F :LspReferences<CR>
