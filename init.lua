@@ -68,7 +68,7 @@ keymap.set('n', '<Down>', '<cmd>bprevious<CR>')
 keymap.set('n', 'ZZ', '<Nop>')
 keymap.set('n', 'ZQ', '<Nop>')
 keymap.set('n', '<C-i>', '<cmd>LspDefinition<CR>')
-keymap.set('n', 'f', '<cmd>LspHober<CR>')
+keymap.set('n', 'f', '<cmd>LspHover<CR>')
 keymap.set('n', 'F', '<cmd>LspReference<CR>')
 
 tab_prefix = '<S-t>'
@@ -275,3 +275,9 @@ if os.getenv("WSL_DISTRO_NAME") ~= nil then
         })
     end
 end
+
+vim.g.asyncomplete_auto_popup = 0
+vim.g.lsp_log_verbose = 1
+vim.g.lsp_log_file = vim.fn.stdpath('cache') .. '/lsp.log'
+vim.g.lsp_diagnostics_enabled = 1
+vim.g.lsp_document_highlight_enabled = 0
