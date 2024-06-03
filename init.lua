@@ -16,6 +16,9 @@ if not vim.loop.fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
+chat_prefix = '<S-c>'
+tab_prefix = '<S-t>'
+
 require("lazy").setup {
     {'preservim/nerdtree'},
     {'vim-jp/vimdoc-ja'},
@@ -24,10 +27,19 @@ require("lazy").setup {
     {'preservim/nerdtree'},
     {'junegunn/fzf', build="./install --bin"},
     {'junegunn/fzf.vim'},
+    {
+      "ibhagwan/fzf-lua",
+      -- optional for icon support
+      dependencies = { "nvim-tree/nvim-web-devicons" },
+      config = function()
+        -- calling `setup` is optional for customization
+        require("fzf-lua").setup({})
+      end
+    },
     {'tpope/vim-fugitive'},
     {'tpope/vim-surround'},
     { 'nvim-lualine/lualine.nvim', dependencies = { 'nvim-tree/nvim-web-devicons' } },
-    { 'prabirshrestha/vim-lsp' },
+    {'prabirshrestha/vim-lsp'},
     {'mattn/vim-lsp-settings'},
     {'prabirshrestha/asyncomplete.vim'},
     {'prabirshrestha/asyncomplete-lsp.vim'},
@@ -38,19 +50,58 @@ require("lazy").setup {
         'CopilotC-Nvim/CopilotChat.nvim',
         branch = "canary",
         dependencies = {
-          { "zbirenbaum/copilot.lua" }, -- or github/copilot.vim
-          { "nvim-lua/plenary.nvim" }, -- for curl, log wrapper
+            { "zbirenbaum/copilot.lua" }, -- or github/copilot.vim
+            { "nvim-lua/plenary.nvim" }, -- for curl, log wrapper
         },
         opts = {
-          debug = true, -- Enable debugging
-          -- See Configuration section for rest
+            debug = true, -- Enable debugging
         },
-        -- See Commands section for default commands if you want to lazy load on them
-  }
+    }
 }
 
 require('lualine').setup {
     options = { theme = 'jellybeans'}
+}
+
+local select = require('CopilotChat.select')
+require("CopilotChat").setup {
+  debug = true, -- Enable debugging
+
+  -- プロンプトの設定
+  prompts = {
+    Explain = {
+      prompt = '/COPILOT_EXPLAIN カーソル上のコードの説明を段落をつけて書いてください。',
+    },
+    Review = {
+      prompt = '/COPILOT_REVIEW 選択したコードのレビューをしてください。',
+    },
+    Tests = {
+      prompt = '/COPILOT_TESTS カーソル上のコードの詳細な単体テスト関数を書いてください。',
+    },
+    Fix = {
+      prompt = '/COPILOT_FIX このコードには問題があります。バグを修正したコードに書き換えてください。',
+    },
+    Optimize = {
+      prompt = '/COPILOT_REFACTOR 選択したコードを最適化し、パフォーマンスと可読性を向上させてください。',
+    },
+    Docs = {
+      prompt = '/COPILOT_REFACTOR 選択したコードのドキュメントを書いてください。ドキュメントをコメントとして追加した元のコードを含むコードブロックで回答してください。使用するプログラミング言語に最も適したドキュメントスタイルを使用してください（例：JavaScriptのJSDoc、Pythonのdocstringsなど）',
+    },
+    FixDiagnostic = {
+      prompt = 'ファイル内の次のような診断上の問題を解決してください：',
+      selection = select.diagnostics,
+    },
+    Commit = {
+        prompt = 'コミットメッセージを次の規約に従って記述してください。規約：タイトルは最大50文字で、メッセージは72文字で折り返す。メッセージ全体をgitcommit言語でコードブロックにラップする。',
+        selection = select.gitdiff,
+    },
+    CommitStaged = {
+        prompt = 'コミットメッセージを次の規約に従って記述してください。規約：タイトルは最大50文字で、メッセージは72文字で折り返す。メッセージ全体をgitcommit言語でコードブロックにラップする。',
+        selection = function(source)
+        return select.gitdiff(source, true)
+      end,
+    },
+  }
 }
 
 --keybinds
@@ -71,7 +122,6 @@ keymap.set('n', '<C-i>', '<cmd>LspDefinition<CR>')
 keymap.set('n', 'f', '<cmd>LspHover<CR>')
 keymap.set('n', 'F', '<cmd>LspReference<CR>')
 
-tab_prefix = '<S-t>'
 keymap.set('n', tab_prefix, '<Nop>')
 keymap.set('n', tab_prefix..'n', '<cmd>tabnew<CR>')
 keymap.set('n', tab_prefix..'e', '<cmd>tabedit<CR>')
@@ -80,6 +130,10 @@ keymap.set('n', tab_prefix..'l', '<cmd>tabnext<CR>')
 keymap.set('n', tab_prefix..'h', '<cmd>tabprevious<CR>')
 keymap.set('n', tab_prefix..'S-l', '<cmd>+tabmove<CR>')
 keymap.set('n', tab_prefix..'S-h', '<cmd>-tabmove<CR>')
+
+keymap.set("n", chat_prefix.."q", "<cmd>QuickChat<CR>")
+keymap.set("n", chat_prefix.."p", "<cmd>ChatActionPrompt<CR>")
+
 
 --insert
 keymap.set('i', '<C-b>', '<Left>')
@@ -128,7 +182,7 @@ set.wildmode = 'longest', 'full'
 set.wrapscan = true
 set.hlsearch = true
 set.incsearch = true
-set.clipboard = 'unnamed'
+set.clipboard = {'unnamedplus', 'unnamed'}
 set.ruler = true
 set.pumheight = 10
 set.infercase = true
@@ -261,6 +315,28 @@ vim.api.nvim_create_user_command('PascalCase', function()
     convert_selection_to_case(to_pascal_case)
 end, {range = true})
 
+-- バッファの内容全体を使って Copilot とチャットする
+function copilot_chat_buffer()
+  local input = vim.fn.input("Quick Chat: ")
+  if input ~= "" then
+    require("CopilotChat").ask(input, { selection = require("CopilotChat.select").buffer })
+  end
+end
+
+vim.api.nvim_create_user_command('QuickChat', function()
+    copilot_chat_buffer()
+end, {})
+
+-- fzf.lua を使ってアクションプロンプトを表示する
+function show_copilot_chat_action_prompt()
+  local actions = require("CopilotChat.actions")
+  require("CopilotChat.integrations.fzflua").pick(actions.prompt_actions())
+end
+
+vim.api.nvim_create_user_command('ChatActionPrompt', function()
+    show_copilot_chat_action_prompt()
+end, {})
+
 -- WSL clipboard
 if os.getenv("WSL_DISTRO_NAME") ~= nil then
     local clip = 'iconv -t sjis | clip.exe'
@@ -281,3 +357,4 @@ vim.g.lsp_log_verbose = 1
 vim.g.lsp_log_file = vim.fn.stdpath('cache') .. '/lsp.log'
 vim.g.lsp_diagnostics_enabled = 1
 vim.g.lsp_document_highlight_enabled = 0
+
