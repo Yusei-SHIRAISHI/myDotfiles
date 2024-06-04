@@ -24,17 +24,13 @@ require("lazy").setup {
     {'vim-jp/vimdoc-ja'},
     {'nanotech/jellybeans.vim'},
     {'cohama/lexima.vim'},
-    {'preservim/nerdtree'},
     {'junegunn/fzf', build="./install --bin"},
-    {'junegunn/fzf.vim'},
     {
-      "ibhagwan/fzf-lua",
-      -- optional for icon support
-      dependencies = { "nvim-tree/nvim-web-devicons" },
-      config = function()
-        -- calling `setup` is optional for customization
-        require("fzf-lua").setup({})
-      end
+        "ibhagwan/fzf-lua",
+        dependencies = { "nvim-tree/nvim-web-devicons" },
+        config = function()
+            require("fzf-lua").setup({{'fzf-vim', 'borderless_full'}})
+        end
     },
     {'tpope/vim-fugitive'},
     {'tpope/vim-surround'},
@@ -56,6 +52,10 @@ require("lazy").setup {
         opts = {
             debug = true, -- Enable debugging
         },
+        cmd = {
+            "CCBuffer",
+            "CCPromptList",
+        }
     }
 }
 
@@ -67,7 +67,19 @@ local select = require('CopilotChat.select')
 require("CopilotChat").setup {
   debug = true, -- Enable debugging
 
-  -- プロンプトの設定
+  window = {
+    layout = 'float', -- 'vertical', 'horizontal', 'float', 'replace'
+    width = 0.5, -- fractional width of parent, or absolute width in columns when > 1
+    height = 0.5, -- fractional height of parent, or absolute height in rows when > 1
+    -- Options below only apply to floating windows
+    relative = 'editor', -- 'editor', 'win', 'cursor', 'mouse'
+    border = 'single', -- 'none', single', 'double', 'rounded', 'solid', 'shadow'
+    row = nil, -- row position of the window, default is centered
+    col = nil, -- column position of the window, default is centered
+    title = 'Copilot Chat', -- title of chat window
+    footer = nil, -- footer of chat window
+    zindex = 1, -- determines if window is on top or below other floating windows
+  },
   prompts = {
     Explain = {
       prompt = '/COPILOT_EXPLAIN カーソル上のコードの説明を段落をつけて書いてください。',
@@ -98,8 +110,8 @@ require("CopilotChat").setup {
     CommitStaged = {
         prompt = 'コミットメッセージを次の規約に従って記述してください。規約：タイトルは最大50文字で、メッセージは72文字で折り返す。メッセージ全体をgitcommit言語でコードブロックにラップする。',
         selection = function(source)
-        return select.gitdiff(source, true)
-      end,
+            return select.gitdiff(source, true)
+        end,
     },
   }
 }
@@ -113,6 +125,7 @@ keymap.set('n', 'gk', 'k')
 keymap.set('n', '<C-j>', '<C-e>')
 keymap.set('n', '<C-k>', '<C-y>')
 keymap.set('n', '<C-n>', '<cmd>NERDTreeToggle<CR>')
+keymap.set('n', '<C-p>', '<cmd>CopilotChatToggle<CR>')
 keymap.set('n', '<ESC><ESC>', '<cmd>nohlsearch<CR>')
 keymap.set('n', '<Up>', '<cmd>bnext<CR>')
 keymap.set('n', '<Down>', '<cmd>bprevious<CR>')
@@ -130,10 +143,6 @@ keymap.set('n', tab_prefix..'l', '<cmd>tabnext<CR>')
 keymap.set('n', tab_prefix..'h', '<cmd>tabprevious<CR>')
 keymap.set('n', tab_prefix..'S-l', '<cmd>+tabmove<CR>')
 keymap.set('n', tab_prefix..'S-h', '<cmd>-tabmove<CR>')
-
-keymap.set("n", chat_prefix.."q", "<cmd>QuickChat<CR>")
-keymap.set("n", chat_prefix.."p", "<cmd>ChatActionPrompt<CR>")
-
 
 --insert
 keymap.set('i', '<C-b>', '<Left>')
@@ -188,6 +197,7 @@ set.pumheight = 10
 set.infercase = true
 
 vim.cmd[[colorscheme jellybeans]]
+vim.cmd[[highlight NormalFloat guibg=#151515]]
 
 local term_open = augroup("term_open", { clear = true })
 autocmd('TermOpen', {
@@ -315,26 +325,19 @@ vim.api.nvim_create_user_command('PascalCase', function()
     convert_selection_to_case(to_pascal_case)
 end, {range = true})
 
--- バッファの内容全体を使って Copilot とチャットする
-function copilot_chat_buffer()
-  local input = vim.fn.input("Quick Chat: ")
-  if input ~= "" then
-    require("CopilotChat").ask(input, { selection = require("CopilotChat.select").buffer })
-  end
+local function copilot_chat_with_buffer()
+    require("CopilotChat").open({ selection = require("CopilotChat.select").buffer })
 end
-
-vim.api.nvim_create_user_command('QuickChat', function()
-    copilot_chat_buffer()
+vim.api.nvim_create_user_command('CCBuffer', function()
+    copilot_chat_with_buffer()
 end, {})
 
--- fzf.lua を使ってアクションプロンプトを表示する
-function show_copilot_chat_action_prompt()
-  local actions = require("CopilotChat.actions")
-  require("CopilotChat.integrations.fzflua").pick(actions.prompt_actions())
+local function copilot_chat_prompt_list()
+    local actions = require("CopilotChat.actions")
+    require("CopilotChat.integrations.fzflua").pick(actions.prompt_actions())
 end
-
-vim.api.nvim_create_user_command('ChatActionPrompt', function()
-    show_copilot_chat_action_prompt()
+vim.api.nvim_create_user_command('CCPromptList', function()
+    copilot_chat_prompt_list()
 end, {})
 
 -- WSL clipboard
