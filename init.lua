@@ -64,6 +64,33 @@ require('lualine').setup {
 }
 
 local select = require('CopilotChat.select')
+local commit_prompt = [[
+    コミットメッセージを次の規約に従って記述してください。
+    規約：
+        - タイトルは最大50文字で、メッセージは72文字で折り返す。メッセージ全体をgitcommit言語でコードブロックにラップする。
+        - フォーマットは次の通りです。
+            ```gitcommit
+            [コミットタイプ]: [変更内容の要約]
+
+            [変更内容の詳細]
+
+            <メッセージ>
+            ```
+
+            - コミットタイプは次のいずれかです。
+                - build: ビルド関連の変更
+                - fix: バグ修正
+                - feat: 新機能の追加、修正
+                - docs: ドキュメントのみの変更
+                - style: コードの意味に影響を与えない変更（空白、フォーマット、セミコロンの欠落など）
+                - refactor: 既存のコードのリファクタリング
+                - perf: パフォーマンスを向上させるコードの変更
+                - test: テストの追加、変更、削除
+                - ci: CI/CDの設定変更
+                - chore: 雑用（ライブラリのアップデートなど）
+            - 複数のコミットタイプを含める場合は','で区切ってください。
+]]
+
 require("CopilotChat").setup {
   debug = true, -- Enable debugging
 
@@ -103,12 +130,14 @@ require("CopilotChat").setup {
       prompt = 'ファイル内の次のような診断上の問題を解決してください：',
       selection = select.diagnostics,
     },
-    Commit = {
-        prompt = 'コミットメッセージを次の規約に従って記述してください。規約：タイトルは最大50文字で、メッセージは72文字で折り返す。メッセージ全体をgitcommit言語でコードブロックにラップする。',
-        selection = select.gitdiff,
+    StagedReview = {
+        prompt = '次のコードのレビューしてください',
+        selection = function(source)
+            return select.gitdiff(source, true)
+        end,
     },
-    CommitStaged = {
-        prompt = 'コミットメッセージを次の規約に従って記述してください。規約：タイトルは最大50文字で、メッセージは72文字で折り返す。メッセージ全体をgitcommit言語でコードブロックにラップする。',
+    Commit = {
+        prompt = commit_prompt,
         selection = function(source)
             return select.gitdiff(source, true)
         end,
@@ -132,8 +161,8 @@ keymap.set('n', '<Down>', '<cmd>bprevious<CR>')
 keymap.set('n', 'ZZ', '<Nop>')
 keymap.set('n', 'ZQ', '<Nop>')
 keymap.set('n', '<C-i>', '<cmd>LspDefinition<CR>')
-keymap.set('n', 'f', '<cmd>LspHover<CR>')
-keymap.set('n', 'F', '<cmd>LspReference<CR>')
+keymap.set('n', '<C-h>h', '<cmd>LspHover<CR>')
+keymap.set('n', '<C-h>', '<cmd>LspReference<CR>')
 
 keymap.set('n', tab_prefix, '<Nop>')
 keymap.set('n', tab_prefix..'n', '<cmd>tabnew<CR>')
@@ -360,4 +389,5 @@ vim.g.lsp_log_verbose = 1
 vim.g.lsp_log_file = vim.fn.stdpath('cache') .. '/lsp.log'
 vim.g.lsp_diagnostics_enabled = 1
 vim.g.lsp_document_highlight_enabled = 0
+vim.g.lsp_settings_filetype_ruby = {'solargraph'}
 
