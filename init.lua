@@ -54,7 +54,7 @@ require("lazy").setup {
         },
         cmd = {
             "CCBuffer",
-            "CCPromptList",
+            "CCPrompt",
         }
     }
 }
@@ -108,11 +108,17 @@ require("CopilotChat").setup {
     zindex = 1, -- determines if window is on top or below other floating windows
   },
   prompts = {
-    Explain = {
-      prompt = '/COPILOT_EXPLAIN カーソル上のコードの説明を段落をつけて書いてください。',
+    Comment = {
+      prompt = '/COPILOT_EXPLAIN 選択したコードの説明をコメントとして書いてください。',
     },
     Review = {
       prompt = '/COPILOT_REVIEW 選択したコードのレビューをしてください。',
+    },
+    ReviewStaged = {
+      prompt = '/COPILOT_REVIEW 選択したコードのレビューをしてください。',
+      selection = function(source)
+          return select.gitdiff(source, true)
+      end,
     },
     Tests = {
       prompt = '/COPILOT_TESTS カーソル上のコードの詳細な単体テスト関数を書いてください。',
@@ -125,6 +131,9 @@ require("CopilotChat").setup {
     },
     Docs = {
       prompt = '/COPILOT_REFACTOR 選択したコードのドキュメントを書いてください。ドキュメントをコメントとして追加した元のコードを含むコードブロックで回答してください。使用するプログラミング言語に最も適したドキュメントスタイルを使用してください（例：JavaScriptのJSDoc、Pythonのdocstringsなど）',
+    },
+    DocsJa = {
+      prompt = '/COPILOT_REFACTOR 選択したコードのドキュメントを日本語で書いてください。ドキュメントをコメントとして追加した元のコードを含むコードブロックで回答してください。使用するプログラミング言語に最も適したドキュメントスタイルを使用してください（例：JavaScriptのJSDoc、Pythonのdocstringsなど）',
     },
     FixDiagnostic = {
       prompt = 'ファイル内の次のような診断上の問題を解決してください：',
@@ -361,12 +370,12 @@ vim.api.nvim_create_user_command('CCBuffer', function()
     copilot_chat_with_buffer()
 end, {})
 
-local function copilot_chat_prompt_list()
+local function copilot_chat_prompt()
     local actions = require("CopilotChat.actions")
     require("CopilotChat.integrations.fzflua").pick(actions.prompt_actions())
 end
-vim.api.nvim_create_user_command('CCPromptList', function()
-    copilot_chat_prompt_list()
+vim.api.nvim_create_user_command('CCPrompt', function()
+    copilot_chat_prompt()
 end, {})
 
 -- WSL clipboard
