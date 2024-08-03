@@ -29,7 +29,7 @@ require("lazy").setup {
         "ibhagwan/fzf-lua",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
-            require("fzf-lua").setup({{'fzf-vim', 'borderless_full'}})
+            require("fzf-lua").setup({{'fzf-vim', 'border'}})
         end
     },
     {'tpope/vim-fugitive'},
@@ -49,12 +49,8 @@ require("lazy").setup {
             { "zbirenbaum/copilot.lua" }, -- or github/copilot.vim
             { "nvim-lua/plenary.nvim" }, -- for curl, log wrapper
         },
-        opts = {
-            debug = true, -- Enable debugging
-        },
         cmd = {
-            "CCBuffer",
-            "CCPrompt",
+            "CopilotChatPromptList",
         }
     }
 }
@@ -70,6 +66,7 @@ local commit_prompt = [[
         - タイトルは最大50文字で、メッセージは72文字で折り返す。メッセージ全体をgitcommit言語でコードブロックにラップする。
         - 日本語で記述を行う
         - フォーマットは次の通りです。
+        - 日本語で記載してください
             ```gitcommit
             [#{コミットタイプ}]: 変更内容の要約
 
@@ -93,12 +90,10 @@ local commit_prompt = [[
 ]]
 
 require("CopilotChat").setup {
-  debug = true, -- Enable debugging
-
   window = {
     layout = 'float', -- 'vertical', 'horizontal', 'float', 'replace'
-    width = 0.5, -- fractional width of parent, or absolute width in columns when > 1
-    height = 0.5, -- fractional height of parent, or absolute height in rows when > 1
+    width = 0.7, -- fractional width of parent, or absolute width in columns when > 1
+    height = 0.7, -- fractional height of parent, or absolute height in rows when > 1
     -- Options below only apply to floating windows
     relative = 'editor', -- 'editor', 'win', 'cursor', 'mouse'
     border = 'single', -- 'none', single', 'double', 'rounded', 'solid', 'shadow'
@@ -108,9 +103,17 @@ require("CopilotChat").setup {
     footer = nil, -- footer of chat window
     zindex = 1, -- determines if window is on top or below other floating windows
   },
+  system_prompt = require('prompts.system_prompt'),
   prompts = {
     Comment = {
       prompt = '/COPILOT_EXPLAIN 選択したコードの説明をコメントとして書いてください。',
+    },
+    MyCustomPromptWithCustomSystemPrompt = {
+      system_prompt = 'Your name is Johny Microsoft and you are not an AI assistant for developers.',
+      prompt = 'Explain how it works.',
+    },
+    Explain = {
+      prompt = '/COPILOT_EXPLAIN 選択したのコードの説明をしてください。',
     },
     Review = {
       prompt = '/COPILOT_REVIEW 選択したコードのレビューをしてください。',
@@ -165,6 +168,7 @@ keymap.set('n', '<C-j>', '<C-e>')
 keymap.set('n', '<C-k>', '<C-y>')
 keymap.set('n', '<C-n>', '<cmd>NERDTreeToggle<CR>')
 keymap.set('n', '<C-p>', '<cmd>CopilotChatToggle<CR>')
+keymap.set('n', '<C-m>', '<cmd>FzfLua commands<CR>')
 keymap.set('n', '<ESC><ESC>', '<cmd>nohlsearch<CR>')
 keymap.set('n', '<Up>', '<cmd>bnext<CR>')
 keymap.set('n', '<Down>', '<cmd>bprevious<CR>')
@@ -196,6 +200,7 @@ keymap.set('i', '<C-r><C-r>', '<Plug>(copilot-suggest)')
 --visual
 keymap.set('v', '<C-j>', '<C-e>')
 keymap.set('v', '<C-k>', '<C-y>')
+keymap.set('v', '<C-m>', '<cmd>FzfLua commands<CR>')
 
 --command
 keymap.set('c', '<C-p>', '<C-r>')
@@ -214,8 +219,8 @@ set.undofile = true
 set.helplang = "ja", "en"
 set.showmatch = true
 set.mouse = ""
-set.showtabline = 4
-set.tabstop   = 4
+set.showtabline = 2
+set.tabstop   = 2
 set.expandtab = true
 set.shiftwidth = 4
 set.autoindent = true
@@ -364,19 +369,12 @@ vim.api.nvim_create_user_command('PascalCase', function()
     convert_selection_to_case(to_pascal_case)
 end, {range = true})
 
-local function copilot_chat_with_buffer()
-    require("CopilotChat").open({ selection = require("CopilotChat.select").buffer })
-end
-vim.api.nvim_create_user_command('CCBuffer', function()
-    copilot_chat_with_buffer()
-end, {})
-
-local function copilot_chat_prompt()
+local function copilot_chat_prompt_list()
     local actions = require("CopilotChat.actions")
     require("CopilotChat.integrations.fzflua").pick(actions.prompt_actions())
 end
-vim.api.nvim_create_user_command('CCPrompt', function()
-    copilot_chat_prompt()
+vim.api.nvim_create_user_command('CopilotChatPromptList', function()
+    copilot_chat_prompt_list()
 end, {})
 
 -- WSL clipboard
