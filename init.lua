@@ -89,6 +89,7 @@ local commit_prompt = [[
             - 複数のコミットタイプを含める場合は','で区切ってください。
 ]]
 
+vim.opt.runtimepath:append('~/.config/nvim/prompts')
 require("CopilotChat").setup {
   window = {
     layout = 'float', -- 'vertical', 'horizontal', 'float', 'replace'
