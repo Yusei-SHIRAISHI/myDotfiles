@@ -44,9 +44,9 @@ require("lazy").setup {
     {'github/copilot.vim'},
     {
         'CopilotC-Nvim/CopilotChat.nvim',
-        branch = "canary",
+        branch = "main",
         dependencies = {
-            { "zbirenbaum/copilot.lua" }, -- or github/copilot.vim
+            { "zbirenbaum/copilot.vim" }, -- or github/copilot.vim
             { "nvim-lua/plenary.nvim" }, -- for curl, log wrapper
         },
         cmd = {
@@ -109,18 +109,17 @@ require("CopilotChat").setup {
     Comment = {
       prompt = '/COPILOT_EXPLAIN 選択したコードの説明をコメントとして書いてください。',
     },
-    MyCustomPromptWithCustomSystemPrompt = {
-      system_prompt = 'Your name is Johny Microsoft and you are not an AI assistant for developers.',
-      prompt = 'Explain how it works.',
-    },
     Explain = {
       prompt = '/COPILOT_EXPLAIN 選択したのコードの説明をしてください。',
     },
     Review = {
       prompt = '/COPILOT_REVIEW 選択したコードのレビューをしてください。',
+      selection = function(source)
+          return select.visual(source) or select.buffer(source)
+      end,
     },
     ReviewStaged = {
-      prompt = '/COPILOT_REVIEW 選択したコードのレビューをしてください。',
+      prompt = '/COPILOT_REVIEW コードレビューをしてください。',
       selection = function(source)
           return select.gitdiff(source, true)
       end,
@@ -144,12 +143,6 @@ require("CopilotChat").setup {
       prompt = 'ファイル内の次のような診断上の問題を解決してください：',
       selection = select.diagnostics,
     },
-    StagedReview = {
-        prompt = '次のコードのレビューしてください',
-        selection = function(source)
-            return select.gitdiff(source, true)
-        end,
-    },
     Commit = {
         prompt = commit_prompt,
         selection = function(source)
@@ -169,7 +162,7 @@ keymap.set('n', '<C-j>', '<C-e>')
 keymap.set('n', '<C-k>', '<C-y>')
 keymap.set('n', '<C-n>', '<cmd>NERDTreeToggle<CR>')
 keymap.set('n', '<C-p>', '<cmd>CopilotChatToggle<CR>')
-keymap.set('n', '<C-m>', '<cmd>FzfLua commands<CR>')
+keymap.set('n', '\\', '<cmd>FzfLua commands<CR>')
 keymap.set('n', '<ESC><ESC>', '<cmd>nohlsearch<CR>')
 keymap.set('n', '<Up>', '<cmd>bnext<CR>')
 keymap.set('n', '<Down>', '<cmd>bprevious<CR>')
@@ -197,11 +190,15 @@ keymap.set('i', '<C-w>', '<Plug>(copilot-accept-word)')
 keymap.set('i', '<C-l>', '<Plug>(copilot-accept-line)')
 keymap.set('i', '<C-r>', '<Plug>(copilot-dismiss)')
 keymap.set('i', '<C-r><C-r>', '<Plug>(copilot-suggest)')
+keymap.set({ 'n', 'i' }, '<C-x><C-f>',
+    function() require("fzf-lua").complete_path() end,
+    { silent=true, desc = "Fuzzy complete path" }
+)
 
 --visual
 keymap.set('v', '<C-j>', '<C-e>')
 keymap.set('v', '<C-k>', '<C-y>')
-keymap.set('v', '<C-m>', '<cmd>FzfLua commands<CR>')
+keymap.set('v', '\\', '<cmd>FzfLua commands<CR>')
 
 --command
 keymap.set('c', '<C-p>', '<C-r>')
@@ -312,6 +309,13 @@ vim.api.nvim_create_user_command(
     end,
     {}
 )
+vim.api.nvim_create_user_command(
+    'Filename',
+    function()
+        print(vim.fn.expand('%:t'))
+    end,
+    {}
+)
 
 local function to_snake_case(str)
     return str:gsub("(%l)(%u)", "%1_%2"):gsub("%s+", "_"):lower()
@@ -399,4 +403,3 @@ vim.g.lsp_log_file = vim.fn.stdpath('cache') .. '/lsp.log'
 vim.g.lsp_diagnostics_enabled = 1
 vim.g.lsp_document_highlight_enabled = 0
 vim.g.lsp_settings_filetype_ruby = {'solargraph'}
-
