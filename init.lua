@@ -194,6 +194,16 @@ keymap.set({ 'n', 'i' }, '<C-x><C-f>',
     function() require("fzf-lua").complete_path() end,
     { silent=true, desc = "Fuzzy complete path" }
 )
+keymap.set({ 'n', 'i' }, '<C-x><C-i>',
+    function()
+        require("fzf-lua").fzf_exec("rg --files",
+        { actions = { ['enter'] = function(selected, opts)
+            vim.api.nvim_put(selected, "c", true, true)
+        end } })
+        vim.cmd("startinsert")
+    end,
+    { silent=true, desc = "Fuzzy insert path" }
+)
 
 --visual
 keymap.set('v', '<C-j>', '<C-e>')
