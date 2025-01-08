@@ -29,7 +29,7 @@ require("lazy").setup {
         "ibhagwan/fzf-lua",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
-            require("fzf-lua").setup({{'fzf-vim', 'border'}})
+            require("fzf-lua").setup({{'fzf-vim'}})
         end
     },
     {'tpope/vim-fugitive'},
@@ -41,12 +41,11 @@ require("lazy").setup {
     {'prabirshrestha/asyncomplete-lsp.vim'},
     {'mattn/vim-lsp-icons'},
     {'hrsh7th/vim-vsnip'},
-    {'github/copilot.vim'},
     {
         'CopilotC-Nvim/CopilotChat.nvim',
         branch = "main",
         dependencies = {
-            { "zbirenbaum/copilot.vim" }, -- or github/copilot.vim
+            { "github/copilot.vim" },
             { "nvim-lua/plenary.nvim" }, -- for curl, log wrapper
         },
         cmd = {
